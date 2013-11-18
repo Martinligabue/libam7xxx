@@ -25,7 +25,7 @@ It is handy on systems where usb-modeswitch is not available, like Windows.
 EXAMPLE OF USE
 --------------
 
-am7xxx-modeswitch
+  am7xxx-modeswitch
 
 
 EXIT STATUS

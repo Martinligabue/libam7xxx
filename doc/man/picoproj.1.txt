@@ -55,13 +55,13 @@ OPTIONS
     the height of the image to upload
 
 *-h*::
-    this help message
+    show the help message
 
 
 EXAMPLE OF USE
 --------------
 
-picoproj -f file.jpg -F 1 -l 5 -W 800 -H 480
+  picoproj -f file.jpg -F 1 -l 5 -W 800 -H 480
 
 
 EXIT STATUS
