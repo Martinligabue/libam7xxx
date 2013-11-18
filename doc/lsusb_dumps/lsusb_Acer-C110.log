@@ -5,8 +5,8 @@ Device Descriptor:
   bDescriptorType         1
   bcdUSB               2.00
   bDeviceClass          255 Vendor Specific Class
-  bDeviceSubClass         0 
-  bDeviceProtocol         0 
+  bDeviceSubClass         0
+  bDeviceProtocol         0
   bMaxPacketSize0        64
   idVendor           0x1de1 Actions Microelectronics Co.
   idProduct          0xc101 Generic Display Device
@@ -32,8 +32,8 @@ Device Descriptor:
       bAlternateSetting       0
       bNumEndpoints           2
       bInterfaceClass       255 Vendor Specific Class
-      bInterfaceSubClass      8 
-      bInterfaceProtocol      8 
+      bInterfaceSubClass      8
+      bInterfaceProtocol      8
       iInterface              7 USB PICO
       Endpoint Descriptor:
         bLength                 7
@@ -60,8 +60,8 @@ Device Qualifier (for other device speed):
   bDescriptorType         6
   bcdUSB               2.00
   bDeviceClass            0 (Defined at Interface level)
-  bDeviceSubClass         0 
-  bDeviceProtocol         0 
+  bDeviceSubClass         0
+  bDeviceProtocol         0
   bMaxPacketSize0        64
   bNumConfigurations      1
 Device Status:     0x0001
