@@ -228,6 +228,18 @@ struct am7xxx_header {
 
 
 #ifdef DEBUG
+static void debug_dump_generic_header(am7xxx_context *ctx, struct am7xxx_generic_header *g)
+{
+	if (ctx == NULL || g == NULL)
+		return;
+
+	debug(ctx, "Generic header:\n");
+	debug(ctx, "\tfield0:  0x%08x (%u)\n", g->field0, g->field0);
+	debug(ctx, "\tfield1:  0x%08x (%u)\n", g->field1, g->field1);
+	debug(ctx, "\tfield2:  0x%08x (%u)\n", g->field2, g->field2);
+	debug(ctx, "\tfield3:  0x%08x (%u)\n", g->field3, g->field3);
+}
+
 static void debug_dump_devinfo_header(am7xxx_context *ctx, struct am7xxx_devinfo_header *d)
 {
 	if (ctx == NULL || d == NULL)
@@ -306,7 +318,8 @@ static void debug_dump_header(am7xxx_context *ctx, struct am7xxx_header *h)
 		break;
 
 	default:
-		debug(ctx, "Packet type not supported!\n");
+		debug(ctx, "Parsing data not supported for this packet type!\n");
+		debug_dump_generic_header(ctx, &(h->header_data.data));
 		break;
 	}
 	debug(ctx, "END\n\n");
