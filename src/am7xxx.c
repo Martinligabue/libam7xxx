@@ -573,6 +573,28 @@ static int send_header(am7xxx_device *dev, struct am7xxx_header *h)
 	return ret;
 }
 
+static int send_command(am7xxx_device *dev, am7xxx_packet_type type)
+{
+	struct am7xxx_header h = {
+		.packet_type     = type,
+		.direction       = AM7XXX_DIRECTION_OUT,
+		.header_data_len = 0x00,
+		.unknown2        = 0x3e,
+		.unknown3        = 0x10,
+		.header_data = {
+			.data = {
+				.field0 = 0,
+				.field1 = 0,
+				.field2 = 0,
+				.field3 = 0,
+			},
+		},
+	};
+
+	return send_header(dev, &h);
+}
+
+
 /* When level == AM7XXX_LOG_FATAL do not check the log_level from the context
  * and print the message unconditionally, this makes it possible to print
  * fatal messages even early on initialization, before the context has been
@@ -1025,28 +1047,14 @@ AM7XXX_PUBLIC int am7xxx_get_device_info(am7xxx_device *dev,
 			   am7xxx_device_info *device_info)
 {
 	int ret;
-	struct am7xxx_header h = {
-		.packet_type     = AM7XXX_PACKET_TYPE_DEVINFO,
-		.direction       = AM7XXX_DIRECTION_OUT,
-		.header_data_len = 0x00,
-		.unknown2        = 0x3e,
-		.unknown3        = 0x10,
-		.header_data = {
-			.devinfo = {
-				.native_width  = 0,
-				.native_height = 0,
-				.unknown0      = 0,
-				.unknown1      = 0,
-			},
-		},
-	};
+	struct am7xxx_header h = { 0 };
 
 	if (dev->device_info) {
 		memcpy(device_info, dev->device_info, sizeof(*device_info));
 		return 0;
 	}
 
-	ret = send_header(dev, &h);
+	ret = send_command(dev, AM7XXX_PACKET_TYPE_DEVINFO);
 	if (ret < 0)
 		return ret;
 
