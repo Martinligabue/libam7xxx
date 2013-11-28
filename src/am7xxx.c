@@ -79,6 +79,7 @@ struct am7xxx_usb_device_descriptor {
 };
 
 static int default_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power);
+static int picopix_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power);
 static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom);
 
 #define DEFAULT_OPS { \
@@ -125,6 +126,9 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		.product_id = 0x0016,
 		.configuration    = 2,
 		.interface_number = 0,
+		.ops = {
+			.set_power_mode = picopix_set_power_mode,
+		},
 	},
 	{
 		.name       = "Philips/Sagemcom PicoPix 2330",
@@ -163,6 +167,9 @@ typedef enum {
 	AM7XXX_PACKET_TYPE_IMAGE   = 0x02,
 	AM7XXX_PACKET_TYPE_POWER   = 0x04,
 	AM7XXX_PACKET_TYPE_ZOOM    = 0x05,
+	AM7XXX_PACKET_TYPE_PICOPIX_POWER_LOW    = 0x15,
+	AM7XXX_PACKET_TYPE_PICOPIX_POWER_MEDIUM = 0x16,
+	AM7XXX_PACKET_TYPE_PICOPIX_POWER_HIGH   = 0x17,
 } am7xxx_packet_type;
 
 struct am7xxx_generic_header {
@@ -888,6 +895,26 @@ static int default_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power)
 		return ret;
 
 	return 0;
+}
+
+static int picopix_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power)
+{
+	switch(power) {
+	case AM7XXX_POWER_LOW:
+		return send_command(dev, AM7XXX_PACKET_TYPE_PICOPIX_POWER_LOW);
+
+	case AM7XXX_POWER_MIDDLE:
+		return send_command(dev, AM7XXX_PACKET_TYPE_PICOPIX_POWER_MEDIUM);
+
+	case AM7XXX_POWER_HIGH:
+		return send_command(dev, AM7XXX_PACKET_TYPE_PICOPIX_POWER_HIGH);
+
+	case AM7XXX_POWER_OFF:
+	case AM7XXX_POWER_TURBO:
+	default:
+		error(dev->ctx, "Unsupported power mode.\n");
+		return -EINVAL;
+	};
 }
 
 static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
