@@ -64,8 +64,10 @@ static void log_message(am7xxx_context *ctx,
 #define debug(ctx, ...)   log_message(ctx,  AM7XXX_LOG_DEBUG,   __func__, 0,        __VA_ARGS__)
 #define trace(ctx, ...)   log_message(ctx,  AM7XXX_LOG_TRACE,   NULL,     0,        __VA_ARGS__)
 
-#define AM7XXX_QUIRK_NO_POWER_MODE (1 << 0)
-#define AM7XXX_QUIRK_NO_ZOOM_MODE  (1 << 1)
+struct am7xxx_ops {
+	int (*set_power_mode)(am7xxx_device *dev, am7xxx_power_mode power);
+	int (*set_zoom_mode)(am7xxx_device *dev, am7xxx_zoom_mode zoom);
+};
 
 struct am7xxx_usb_device_descriptor {
 	const char *name;
@@ -73,8 +75,16 @@ struct am7xxx_usb_device_descriptor {
 	uint16_t product_id;
 	uint8_t configuration;    /* The bConfigurationValue of the device */
 	uint8_t interface_number; /* The bInterfaceNumber of the device */
-	unsigned long quirks;
+	struct am7xxx_ops ops;
 };
+
+static int default_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power);
+static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom);
+
+#define DEFAULT_OPS { \
+	.set_power_mode = default_set_power_mode, \
+	.set_zoom_mode = default_set_zoom_mode, \
+}
 
 static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 	{
@@ -83,6 +93,7 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		.product_id = 0xc101,
 		.configuration    = 2,
 		.interface_number = 0,
+		.ops = DEFAULT_OPS,
 	},
 	{
 		.name       = "Acer C112",
@@ -90,6 +101,7 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		.product_id = 0x5501,
 		.configuration    = 2,
 		.interface_number = 0,
+		.ops = DEFAULT_OPS,
 	},
 	{
 		.name       ="Aiptek PocketCinema T25",
@@ -97,6 +109,7 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		.product_id = 0x2144,
 		.configuration    = 2,
 		.interface_number = 0,
+		.ops = DEFAULT_OPS,
 	},
 	{
 		.name       = "Philips/Sagemcom PicoPix 1020",
@@ -104,6 +117,7 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		.product_id = 0x000e,
 		.configuration    = 2,
 		.interface_number = 0,
+		.ops = DEFAULT_OPS,
 	},
 	{
 		.name       = "Philips/Sagemcom PicoPix 2055",
@@ -111,7 +125,6 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		.product_id = 0x0016,
 		.configuration    = 2,
 		.interface_number = 0,
-		.quirks = AM7XXX_QUIRK_NO_POWER_MODE | AM7XXX_QUIRK_NO_ZOOM_MODE,
 	},
 	{
 		.name       = "Philips/Sagemcom PicoPix 2330",
@@ -119,7 +132,6 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		.product_id = 0x0019,
 		.configuration    = 1,
 		.interface_number = 0,
-		.quirks = AM7XXX_QUIRK_NO_POWER_MODE | AM7XXX_QUIRK_NO_ZOOM_MODE,
 	},
 };
 
@@ -787,6 +799,106 @@ out:
 	return ret;
 }
 
+/* Device specific operations */
+
+static int default_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power)
+{
+	int ret;
+	struct am7xxx_header h = {
+		.packet_type     = AM7XXX_PACKET_TYPE_POWER,
+		.direction       = AM7XXX_DIRECTION_OUT,
+		.header_data_len = sizeof(struct am7xxx_power_header),
+		.unknown2        = 0x3e,
+		.unknown3        = 0x10,
+	};
+
+	switch(power) {
+	case AM7XXX_POWER_OFF:
+		h.header_data.power.bit2 = 0;
+		h.header_data.power.bit1 = 0;
+		h.header_data.power.bit0 = 0;
+		break;
+
+	case AM7XXX_POWER_LOW:
+		h.header_data.power.bit2 = 0;
+		h.header_data.power.bit1 = 0;
+		h.header_data.power.bit0 = 1;
+		break;
+
+	case AM7XXX_POWER_MIDDLE:
+		h.header_data.power.bit2 = 0;
+		h.header_data.power.bit1 = 1;
+		h.header_data.power.bit0 = 0;
+		break;
+
+	case AM7XXX_POWER_HIGH:
+		h.header_data.power.bit2 = 0;
+		h.header_data.power.bit1 = 1;
+		h.header_data.power.bit0 = 1;
+		break;
+
+	case AM7XXX_POWER_TURBO:
+		h.header_data.power.bit2 = 1;
+		h.header_data.power.bit1 = 0;
+		h.header_data.power.bit0 = 0;
+		break;
+
+	default:
+		error(dev->ctx, "Unsupported power mode.\n");
+		return -EINVAL;
+	};
+
+	ret = send_header(dev, &h);
+	if (ret < 0)
+		return ret;
+
+	return 0;
+}
+
+static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
+{
+	int ret;
+	struct am7xxx_header h = {
+		.packet_type     = AM7XXX_PACKET_TYPE_ZOOM,
+		.direction       = AM7XXX_DIRECTION_OUT,
+		.header_data_len = sizeof(struct am7xxx_zoom_header),
+		.unknown2        = 0x3e,
+		.unknown3        = 0x10,
+	};
+
+	switch(zoom) {
+	case AM7XXX_ZOOM_ORIGINAL:
+		h.header_data.zoom.bit1 = 0;
+		h.header_data.zoom.bit0 = 0;
+		break;
+
+	case AM7XXX_ZOOM_H:
+		h.header_data.zoom.bit1 = 0;
+		h.header_data.zoom.bit0 = 1;
+		break;
+
+	case AM7XXX_ZOOM_H_V:
+		h.header_data.zoom.bit1 = 1;
+		h.header_data.zoom.bit0 = 0;
+		break;
+
+	case AM7XXX_ZOOM_TEST:
+		h.header_data.zoom.bit1 = 1;
+		h.header_data.zoom.bit0 = 1;
+		break;
+
+	default:
+		error(dev->ctx, "Unsupported zoom mode.\n");
+		return -EINVAL;
+	};
+
+	ret = send_header(dev, &h);
+	if (ret < 0)
+		return ret;
+
+	return 0;
+}
+
 /* Public API */
 
 AM7XXX_PUBLIC int am7xxx_init(am7xxx_context **ctx)
@@ -1104,110 +1216,22 @@ AM7XXX_PUBLIC int am7xxx_send_image_async(am7xxx_device *dev,
 
 AM7XXX_PUBLIC int am7xxx_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power)
 {
-	int ret;
-	struct am7xxx_header h = {
-		.packet_type     = AM7XXX_PACKET_TYPE_POWER,
-		.direction       = AM7XXX_DIRECTION_OUT,
-		.header_data_len = sizeof(struct am7xxx_power_header),
-		.unknown2        = 0x3e,
-		.unknown3        = 0x10,
-	};
-
-	if (dev->desc->quirks & AM7XXX_QUIRK_NO_POWER_MODE) {
-		debug(dev->ctx,
-		      "setting power mode is unsupported on this device\n");
+	if (dev->desc->ops.set_power_mode == NULL) {
+		warning(dev->ctx,
+			"setting power mode is unsupported on this device\n");
 		return 0;
 	}
 
-	switch(power) {
-	case AM7XXX_POWER_OFF:
-		h.header_data.power.bit2 = 0;
-		h.header_data.power.bit1 = 0;
-		h.header_data.power.bit0 = 0;
-		break;
-
-	case AM7XXX_POWER_LOW:
-		h.header_data.power.bit2 = 0;
-		h.header_data.power.bit1 = 0;
-		h.header_data.power.bit0 = 1;
-		break;
-
-	case AM7XXX_POWER_MIDDLE:
-		h.header_data.power.bit2 = 0;
-		h.header_data.power.bit1 = 1;
-		h.header_data.power.bit0 = 0;
-		break;
-
-	case AM7XXX_POWER_HIGH:
-		h.header_data.power.bit2 = 0;
-		h.header_data.power.bit1 = 1;
-		h.header_data.power.bit0 = 1;
-		break;
-
-	case AM7XXX_POWER_TURBO:
-		h.header_data.power.bit2 = 1;
-		h.header_data.power.bit1 = 0;
-		h.header_data.power.bit0 = 0;
-		break;
-
-	default:
-		error(dev->ctx, "Unsupported power mode.\n");
-		return -EINVAL;
-	};
-
-	ret = send_header(dev, &h);
-	if (ret < 0)
-		return ret;
-
-	return 0;
+	return dev->desc->ops.set_power_mode(dev, power);
 }
 
 AM7XXX_PUBLIC int am7xxx_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
 {
-	int ret;
-	struct am7xxx_header h = {
-		.packet_type     = AM7XXX_PACKET_TYPE_ZOOM,
-		.direction       = AM7XXX_DIRECTION_OUT,
-		.header_data_len = sizeof(struct am7xxx_zoom_header),
-		.unknown2        = 0x3e,
-		.unknown3        = 0x10,
-	};
-
-	if (dev->desc->quirks & AM7XXX_QUIRK_NO_ZOOM_MODE) {
-		debug(dev->ctx,
-		      "setting zoom mode is unsupported on this device\n");
+	if (dev->desc->ops.set_zoom_mode == NULL) {
+		warning(dev->ctx,
+			"setting zoom mode is unsupported on this device\n");
 		return 0;
 	}
 
-	switch(zoom) {
-	case AM7XXX_ZOOM_ORIGINAL:
-		h.header_data.zoom.bit1 = 0;
-		h.header_data.zoom.bit0 = 0;
-		break;
-
-	case AM7XXX_ZOOM_H:
-		h.header_data.zoom.bit1 = 0;
-		h.header_data.zoom.bit0 = 1;
-		break;
-
-	case AM7XXX_ZOOM_H_V:
-		h.header_data.zoom.bit1 = 1;
-		h.header_data.zoom.bit0 = 0;
-		break;
-
-	case AM7XXX_ZOOM_TEST:
-		h.header_data.zoom.bit1 = 1;
-		h.header_data.zoom.bit0 = 1;
-		break;
-
-	default:
-		error(dev->ctx, "Unsupported zoom mode.\n");
-		return -EINVAL;
-	};
-
-	ret = send_header(dev, &h);
-	if (ret < 0)
-		return ret;
-
-	return 0;
+	return dev->desc->ops.set_zoom_mode(dev, zoom);
 }
