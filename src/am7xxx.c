@@ -26,6 +26,7 @@
 
 #include "am7xxx.h"
 #include "serialize.h"
+#include "tools.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -81,6 +82,7 @@ struct am7xxx_usb_device_descriptor {
 static int default_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power);
 static int picopix_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power);
 static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom);
+static int picopix_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom);
 
 #define DEFAULT_OPS { \
 	.set_power_mode = default_set_power_mode, \
@@ -128,6 +130,7 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		.interface_number = 0,
 		.ops = {
 			.set_power_mode = picopix_set_power_mode,
+			.set_zoom_mode = picopix_set_zoom_mode,
 		},
 	},
 	{
@@ -170,6 +173,8 @@ typedef enum {
 	AM7XXX_PACKET_TYPE_PICOPIX_POWER_LOW    = 0x15,
 	AM7XXX_PACKET_TYPE_PICOPIX_POWER_MEDIUM = 0x16,
 	AM7XXX_PACKET_TYPE_PICOPIX_POWER_HIGH   = 0x17,
+	AM7XXX_PACKET_TYPE_PICOPIX_ENABLE_TI    = 0x18,
+	AM7XXX_PACKET_TYPE_PICOPIX_DISABLE_TI   = 0x19,
 } am7xxx_packet_type;
 
 struct am7xxx_generic_header {
@@ -960,6 +965,41 @@ static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
 		return ret;
 
 	return 0;
+}
+
+static int picopix_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
+{
+	int ret;
+	am7xxx_packet_type packet_type;
+
+	switch(zoom) {
+	case AM7XXX_ZOOM_ORIGINAL:
+		packet_type = AM7XXX_PACKET_TYPE_PICOPIX_DISABLE_TI;
+		break;
+
+	case AM7XXX_ZOOM_TELE:
+		packet_type = AM7XXX_PACKET_TYPE_PICOPIX_ENABLE_TI;
+		break;
+
+	case AM7XXX_ZOOM_H:
+	case AM7XXX_ZOOM_H_V:
+	case AM7XXX_ZOOM_TEST:
+	default:
+		error(dev->ctx, "Unsupported zoom mode.\n");
+		return -EINVAL;
+	};
+
+	ret = send_command(dev, packet_type);
+	if (ret < 0)
+		return ret;
+
+	/* The Windows drivers wait for 100ms and send the same command again,
+	 * probably to overcome a firmware deficiency */
+	ret = msleep(100);
+	if (ret < 0)
+		return ret;
+
+	return send_command(dev, packet_type);
 }
 
 /* Public API */
