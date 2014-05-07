@@ -1,10 +1,11 @@
 add_definitions("-D_BSD_SOURCE") # for htole32()
+add_definitions("-D_POSIX_C_SOURCE=199309L") # for nanosleep()
 
 # Find packages needed to build library
 find_package(libusb-1.0 REQUIRED)
 include_directories(${LIBUSB_1_INCLUDE_DIRS})
 
-set(SRC am7xxx.c serialize.c)
+set(SRC am7xxx.c serialize.c tools.c)
 
 # Build the library
 add_library(am7xxx SHARED ${SRC})
