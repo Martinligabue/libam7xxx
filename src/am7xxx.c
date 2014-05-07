@@ -949,6 +949,7 @@ static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
 		h.header_data.zoom.bit0 = 1;
 		break;
 
+	case AM7XXX_ZOOM_TELE:
 	default:
 		error(dev->ctx, "Unsupported zoom mode.\n");
 		return -EINVAL;
