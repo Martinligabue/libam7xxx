@@ -114,12 +114,17 @@ typedef enum {
  *
  * @note On the zoom test screen the version of the firmware running on the
  * device is shown as well (e.g SPI_V21.0.0_2011.03.18).
+ *
+ * @note The Tele mode is available only on some PicoPix models, when using it
+ * the image is distorted like if a different lens was used, but the global
+ * aspect ratio of the image does not change.
  */
 typedef enum {
 	AM7XXX_ZOOM_ORIGINAL = 0, /**< Original Size, as retrieved via #am7xxx_device_info. */
 	AM7XXX_ZOOM_H        = 1, /**< Zoom 1: H Scale (changes aspect ratio). */
 	AM7XXX_ZOOM_H_V      = 2, /**< Zoom 2: H/V Scale (changes aspect ratio). */
 	AM7XXX_ZOOM_TEST     = 3, /**< Zoom test screen, the firmware version is shown as well. */
+	AM7XXX_ZOOM_TELE     = 4, /**< Zoom Tele: available on some PicoPix models. */
 } am7xxx_zoom_mode;
 
 /**

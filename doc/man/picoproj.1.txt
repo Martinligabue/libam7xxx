@@ -46,7 +46,7 @@ OPTIONS
              the slave connector to be plugged in.
 
 *-z* '<zoom mode>'::
-    the display zoom mode, between 0 (original) and 3 (test)
+    the display zoom mode, between 0 (original) and 4 (tele)
 
 *-W* '<image width>'::
     the width of the image to upload

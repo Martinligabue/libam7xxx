@@ -47,8 +47,8 @@ static void usage(char *name)
 	       AM7XXX_POWER_OFF, AM7XXX_POWER_TURBO);
 	printf("\t\t\t\tWARNING: Level 2 and greater require the master AND\n");
 	printf("\t\t\t\t         the slave connector to be plugged in.\n");
-	printf("\t-z <zoom mode>\t\tthe display zoom mode, between %d (original) and %d (test)\n",
-	       AM7XXX_ZOOM_ORIGINAL, AM7XXX_ZOOM_TEST);
+	printf("\t-z <zoom mode>\t\tthe display zoom mode, between %d (original) and %d (tele)\n",
+	       AM7XXX_ZOOM_ORIGINAL, AM7XXX_ZOOM_TELE);
 	printf("\t-W <image width>\tthe width of the image to upload\n");
 	printf("\t-H <image height>\tthe height of the image to upload\n");
 	printf("\t-h \t\t\tthis help message\n");
@@ -138,11 +138,12 @@ int main(int argc, char *argv[])
 			case AM7XXX_ZOOM_H:
 			case AM7XXX_ZOOM_H_V:
 			case AM7XXX_ZOOM_TEST:
+			case AM7XXX_ZOOM_TELE:
 				fprintf(stdout, "Zoom: %d\n", zoom);
 				break;
 			default:
 				fprintf(stderr, "Invalid zoom mode value, must be between %d and %d\n",
-					AM7XXX_ZOOM_ORIGINAL, AM7XXX_ZOOM_TEST);
+					AM7XXX_ZOOM_ORIGINAL, AM7XXX_ZOOM_TELE);
 				ret = -EINVAL;
 				goto out;
 			}
