@@ -1,7 +1,7 @@
-Menchmark methodology
+Benchmark methodology
 
   - Code instrumented with fps-meter
-  - Data acquired with this commdn line:
+  - Data acquired with this command line:
     am7xxx-play -f x11grab -i :0 -o video_size=1024x768
   - Sampling repeated with either am7xxx_send_image or am7xx_send_mage_async
   - Results compared with ministat
