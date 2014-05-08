@@ -1128,7 +1128,7 @@ AM7XXX_PUBLIC int am7xxx_get_device_info(am7xxx_device *dev,
 			   am7xxx_device_info *device_info)
 {
 	int ret;
-	struct am7xxx_header h = { 0 };
+	struct am7xxx_header h;
 
 	if (dev->device_info) {
 		memcpy(device_info, dev->device_info, sizeof(*device_info));
@@ -1139,6 +1139,7 @@ AM7XXX_PUBLIC int am7xxx_get_device_info(am7xxx_device *dev,
 	if (ret < 0)
 		return ret;
 
+	memset(&h, 0, sizeof(h));
 	ret = read_header(dev, &h);
 	if (ret < 0)
 		return ret;
