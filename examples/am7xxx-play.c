@@ -1,7 +1,7 @@
 /*
  * am7xxx-play - play stuff on an am7xxx device (e.g. Acer C110, PicoPix 1020)
  *
- * Copyright (C) 2012  Antonio Ospite <ospite@studenti.unina.it>
+ * Copyright (C) 2012-2014  Antonio Ospite <ao2@ao2.it>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

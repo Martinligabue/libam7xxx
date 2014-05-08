@@ -2,7 +2,7 @@
 #
 # am7xxx-play-window - show only a given window with am7xxx-play
 #
-# Copyright (C) 2013  Antonio Ospite <ospite@studenti.unina.it>
+# Copyright (C) 2013-2014  Antonio Ospite <ao2@ao2.it>
 #
 # This program is free software. It comes without any warranty, to
 # the extent permitted by applicable law. You can redistribute it
