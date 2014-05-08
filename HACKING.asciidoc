@@ -67,7 +67,7 @@ If you want to build for MS Windows:
   $ wget -nv http://download.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.18/libusb-1.0.18-win.7z
   $ 7z -olibusb-1.0.18-win x libusb-1.0.18-win.7z
   $ wget -nv http://win32.libav.org/releases/libav-9.13-win32.7z
-  $ 7z -olibav-9.13-win32 x libav-9.13-win32.7z 
+  $ 7z -olibav-9.13-win32 x libav-9.13-win32.7z
   $ cmake  \
           -D GNU_HOST=i686-w64-mingw32 \
           -D CMAKE_TOOLCHAIN_FILE=../cmake_modules/mingw_cross_toolchain.cmake \

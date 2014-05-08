@@ -67,7 +67,7 @@ Examples of devices based on AM7XXX are:
 
   - Royaltek PJU-2100:
       * http://www.royaltek.com/index.php/pju-2100-pico-projector
-  
+
   - Aiptek PocketCinema T25:
       * http://www.aiptek.eu/index.php/en/products/pico-projectors/pocketcinema-t25
 
@@ -86,7 +86,7 @@ this needs still needs to be verified.
 == Testing libam7xxx on MS Windows
 
 All the needed files below must be in the same location:
-  
+
   - 'MinGW32/dll/libusb-1.0.dll' from
     http://download.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.18/libusb-1.0.18-win.7z
 
