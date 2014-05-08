@@ -85,18 +85,19 @@ this needs still needs to be verified.
 
 == Testing libam7xxx on MS Windows
 
-All the needed files need to be in the same location:
+All the needed files below must be in the same location:
   
-  - 'libusb-1.0.dll' from http://sourceforge.net/projects/libusbx/files/releases/1.0.11/Windows/libusbx-1.0.11-win.7z
+  - 'MinGW32/dll/libusb-1.0.dll' from
+    http://download.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.18/libusb-1.0.18-win.7z
 
   - 'libssp-0.dll' from MinGW;
 
-  - 'am7xxx-modeswitch.exe', 'libam7xxx.dll' and 'picoproj.exe' which can all
-    be built by following the instructions in the HACKING.asciidoc document
-    from libam7xxx.
+  - all the '*.dll' files from the 'win32/usr/bin/' directory in
+    http://win32.libav.org/releases/libav-9.13-win32.7z
 
-  - 'am7xxx-play.exe' and the '.dll' files from the 'usr/bin/' dir in libav-win32:
-    http://win32.libav.org/win32/libav-win32-20120521.7z
+  - 'am7xxx-modeswitch.exe', 'am7xxx-play.exe', 'libam7xxx.dll' and
+    'picoproj.exe' which can all be built by following the instructions in the
+    HACKING.asciidoc document from libam7xxx.
 
 In order to use the device on MS Windows the WinUSB drivers must be installed
 for both the mass storage device and the display device:
