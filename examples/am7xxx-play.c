@@ -223,8 +223,8 @@ static int video_output_init(struct video_output_ctx *output_ctx,
 		goto out;
 	}
 
-	output_codec_ctx->pix_fmt    = PIX_FMT_YUVJ420P;
-	output_codec_ctx->codec_id   = CODEC_ID_MJPEG;
+	output_codec_ctx->pix_fmt    = AV_PIX_FMT_YUVJ420P;
+	output_codec_ctx->codec_id   = AV_CODEC_ID_MJPEG;
 	output_codec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
 
 	/* Set quality and other VBR settings */
@@ -306,7 +306,7 @@ static int am7xxx_play(const char *input_format_string,
 	}
 
 	/* allocate an input frame */
-	picture_raw = avcodec_alloc_frame();
+	picture_raw = av_frame_alloc();
 	if (picture_raw == NULL) {
 		fprintf(stderr, "cannot allocate the raw picture frame!\n");
 		ret = -ENOMEM;
@@ -314,7 +314,7 @@ static int am7xxx_play(const char *input_format_string,
 	}
 
 	/* allocate output frame */
-	picture_scaled = avcodec_alloc_frame();
+	picture_scaled = av_frame_alloc();
 	if (picture_scaled == NULL) {
 		fprintf(stderr, "cannot allocate the scaled picture!\n");
 		ret = -ENOMEM;
@@ -449,9 +449,9 @@ end_while:
 cleanup_out_buf:
 	av_free(out_buf);
 cleanup_picture_scaled:
-	av_free(picture_scaled);
+	av_frame_free(&picture_scaled);
 cleanup_picture_raw:
-	av_free(picture_raw);
+	av_frame_free(&picture_raw);
 
 cleanup_output:
 	/* av_free is needed as well,
