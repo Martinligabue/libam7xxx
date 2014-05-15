@@ -1,3 +1,14 @@
+News for v0.1.5:
+================
+
+  * Add support for setting the power mode (i.e. brightness) on the Philips
+    PicoPix 2055 (Thanks to  Luca Bompani)
+  * Add support for the "Tele" zoom mode available on the PicoPix 2055 (Thanks
+    to  Luca Bompani)
+  * Fix compilation on Mac OSX
+  * Port am7xxx-play to libav10
+  * Update instructions about compiling on Windows
+
 News for v0.1.4:
 ================
 

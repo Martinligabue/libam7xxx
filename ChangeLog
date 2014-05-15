@@ -1,10 +1,122 @@
+2014-05-15 12:33:41 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* HACKING.asciidoc: update Windows cross-build section to use libav10 (HEAD, origin/master, master)
+
+2014-05-12 23:02:28 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* am7xxx-play: port to libav10
+
+2014-05-08 12:59:02 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* Update email address and copyright years
+
+2014-05-08 12:37:44 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* contrib/performance/README: fix some typos
+
+2014-05-08 12:27:23 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* cosmetics: remove some trailing spaces
+
+2014-05-08 12:26:04 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* README.asciidoc: update instructions to test libam7xxx on Windows
+
+2014-05-08 12:15:16 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* HACKING.asciidoc: update the build instructions for Windows
+
+2014-05-08 11:37:34 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* am7xxx: don't use partial designated initializers
+
+2014-05-08 11:22:31 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* am7xxx: add a portable_endian.h
+
+2014-05-07 21:40:44 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* Merge branch 'zoom-tele-picopix'
+
+2014-05-07 18:05:11 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* am7xxx-play: allow setting the AM7XXX_ZOOM_TELE zoom mode
+
+2014-05-07 18:04:16 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* picoproj: allow setting the AM7XXX_ZOOM_TELE zoom mode
+
+2014-05-07 18:01:58 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* am7xxx: implement the set_zoom_mode() operation for the PicoPix 2055
+
+2014-05-07 17:59:30 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* am7xxx: add support for a new AM7XXX_ZOOM_TELE zoom mode
+
+2014-05-07 17:46:50 +0200 Antonio Ospite <ao2@ao2.it>
+
+	* am7xxx: add a msleep() implementation in tools.[ch]
+
+2013-12-04 11:32:26 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* Merge branch 'powermode-PicoPix2055'
+
+2013-11-28 15:23:04 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* am7xxx: add support for setting the power mode on the PicoPix 2055
+
+2013-11-28 15:13:12 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* am7xxx: dump fields of unknown packet types
+
+2013-11-28 14:57:09 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* am7xxx: factor out a send_command() function
+
+2013-11-28 13:49:52 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* am7xxx: switch from device quirks to device ops
+
+2013-11-18 14:41:42 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* doc/lsusb_dumps: add lsusb_Philips-PicoPix-2055.log
+
+2013-11-18 14:38:26 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* doc/lsusb_dumps: strip trailing spaces
+
+2013-11-18 14:35:37 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* doc/man: misc fixes to man pages
+
+2013-10-30 10:41:06 +0100 Antonio Ospite <ospite@studenti.unina.it>
+
+	* CMakeLists.txt: define DEBUG=1 only when CMAKE_BUILD_TYPE=Debug
+
+2013-10-13 15:50:11 +0200 Antonio Ospite <ospite@studenti.unina.it>
+
+	* HACKING.asciidoc: fix the url of the avcodec_encode_video2 patch
+
+2013-09-07 17:30:28 +0200 Antonio Ospite <ospite@studenti.unina.it>
+
+	* am7xxx-play: cosmetics, fix coding style
+
+2013-08-03 15:14:34 +0200 Antonio Ospite <ospite@studenti.unina.it>
+
+	* am7xxx: add quirks for Philips/Sagemcom PicoPix 2055
+
+2013-07-28 23:22:15 +0200 Antonio Ospite <ospite@studenti.unina.it>
+
+	* NEWS: fix a typo s/mode/more/
+
 2013-07-28 11:15:18 +0200 Antonio Ospite <ospite@studenti.unina.it>
 
-	* Release version 0.1.4 (HEAD, master)
+	* Release version 0.1.4 (tag: v0.1.4)
 
 2013-07-28 01:11:42 +0200 Antonio Ospite <ospite@studenti.unina.it>
 
-	* contrib: add some benchmarking data about am7xxx_send_image_async (origin/master)
+	* contrib: add some benchmarking data about am7xxx_send_image_async
 
 2013-07-28 00:50:30 +0200 Antonio Ospite <ospite@studenti.unina.it>
 
@@ -76,7 +188,7 @@
 
 2013-07-21 00:13:33 +0200 Antonio Ospite <ospite@studenti.unina.it>
 
-	* am7xxx-play: use am7xxx_send_image_async() (local-ao2)
+	* am7xxx-play: use am7xxx_send_image_async()
 
 2013-07-21 00:10:28 +0200 Antonio Ospite <ospite@studenti.unina.it>
 
