@@ -66,15 +66,15 @@ If you want to build for MS Windows:
   $ cd build
   $ wget -nv http://download.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.18/libusb-1.0.18-win.7z
   $ 7z -olibusb-1.0.18-win x libusb-1.0.18-win.7z
-  $ wget -nv http://win32.libav.org/releases/libav-9.13-win32.7z
-  $ 7z -olibav-9.13-win32 x libav-9.13-win32.7z
+  $ wget -nv http://win32.libav.org/releases/libav-10.1-win32.7z
+  $ 7z -olibav-10.1-win32 x libav-10.1-win32.7z
   $ cmake  \
           -D GNU_HOST=i686-w64-mingw32 \
           -D CMAKE_TOOLCHAIN_FILE=../cmake_modules/mingw_cross_toolchain.cmake \
           -D CMAKE_INSTALL_PREFIX=libam7xxx-win/ \
           -D LIBUSB_1_INCLUDE_DIR=libusb-1.0.18-win/include/libusb-1.0 \
           -D LIBUSB_1_LIBRARY=libusb-1.0.18-win/MinGW32/dll/libusb-1.0.dll \
-          -D FFMPEG_ROOT=$(pwd)/libav-9.13-win32/win32/usr \
+          -D FFMPEG_ROOT=$(pwd)/libav-10.1-win32/win32/usr \
           ../
   $ make
 
