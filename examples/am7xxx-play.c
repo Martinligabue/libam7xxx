@@ -382,7 +382,7 @@ static int am7xxx_play(const char *input_format_string,
 			goto end_while;
 		}
 
-		/* if we get the complete frame */
+		/* if we got the complete frame */
 		if (got_picture) {
 			/* convert it to YUV */
 			sws_scale(sw_scale_ctx,
