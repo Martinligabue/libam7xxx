@@ -354,6 +354,7 @@ static int am7xxx_play(const char *input_format_string,
 		goto cleanup_out_buf;
 	}
 
+	got_packet = 0;
 	while (run) {
 		/* read packet */
 		ret = av_read_frame(input_ctx.format_ctx, &in_packet);
