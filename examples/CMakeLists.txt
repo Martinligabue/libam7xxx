@@ -50,6 +50,7 @@ if(BUILD_AM7XXX-PLAY)
   if (XCB_FOUND)
     add_definitions("${LIBXCB_DEFINITIONS} -DHAVE_XCB")
     include_directories(${LIBXCB_INCLUDE_DIRS})
+    set(OPTIONAL_LIBRARIES ${LIBXCB_LIBRARIES})
   endif()
 
   add_executable(am7xxx-play am7xxx-play.c)
@@ -57,7 +58,7 @@ if(BUILD_AM7XXX-PLAY)
   target_link_libraries(am7xxx-play am7xxx
     ${FFMPEG_LIBRARIES}
     ${FFMPEG_LIBSWSCALE_LIBRARIES}
-    ${LIBXCB_LIBRARIES})
+    ${OPTIONAL_LIBRARIES})
   install(TARGETS am7xxx-play
     DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 endif()
