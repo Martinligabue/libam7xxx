@@ -746,6 +746,8 @@ static int open_device(am7xxx_context *ctx,
 		}
 	}
 
+	libusb_set_auto_detach_kernel_driver((*dev)->usb_device, 1);
+
 	ret = libusb_claim_interface((*dev)->usb_device,
 				     (*dev)->desc->interface_number);
 	if (ret < 0) {
