@@ -708,6 +708,7 @@ static int open_device(am7xxx_context *ctx,
 		       am7xxx_device **dev)
 {
 	int ret;
+	int current_configuration;
 
 	*dev = find_device(ctx, device_index);
 	if (*dev == NULL) {
@@ -732,19 +733,35 @@ static int open_device(am7xxx_context *ctx,
 	 * to close it again before bailing out.
 	 */
 
-	ret = libusb_set_configuration((*dev)->usb_device,
-				       (*dev)->desc->configuration);
-	if (ret < 0) {
-		debug(ctx, "libusb_set_configuration failed\n");
-		debug(ctx, "Cannot set configuration %hhu\n",
-		      (*dev)->desc->configuration);
-		goto out_libusb_close;
+	current_configuration = -1;
+	libusb_get_configuration((*dev)->usb_device, &current_configuration);
+	if (current_configuration != (*dev)->desc->configuration) {
+		ret = libusb_set_configuration((*dev)->usb_device,
+					       (*dev)->desc->configuration);
+		if (ret < 0) {
+			debug(ctx, "libusb_set_configuration failed\n");
+			debug(ctx, "Cannot set configuration %hhu\n",
+			      (*dev)->desc->configuration);
+			goto out_libusb_close;
+		}
 	}
 
 	ret = libusb_claim_interface((*dev)->usb_device,
 				     (*dev)->desc->interface_number);
 	if (ret < 0) {
 		debug(ctx, "libusb_claim_interface failed\n");
+		debug(ctx, "Cannot claim interface %hhu\n",
+		      (*dev)->desc->interface_number);
+		goto out_libusb_close;
+	}
+
+	/* Checking that the configuration has not changed, as suggested in
+	 * http://libusb.sourceforge.net/api-1.0/caveats.html
+	 */
+	current_configuration = -1;
+	libusb_get_configuration((*dev)->usb_device, &current_configuration);
+	if (current_configuration != (*dev)->desc->configuration) {
+		debug(ctx, "libusb configuration changed\n");
 		debug(ctx, "Cannot claim interface %hhu\n",
 		      (*dev)->desc->interface_number);
 		goto out_libusb_close;
