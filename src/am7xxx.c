@@ -747,11 +747,14 @@ static int open_device(am7xxx_context *ctx,
 		debug(ctx, "libusb_claim_interface failed\n");
 		debug(ctx, "Cannot claim interface %hhu\n",
 		      (*dev)->desc->interface_number);
-out_libusb_close:
-		libusb_close((*dev)->usb_device);
-		(*dev)->usb_device = NULL;
+		goto out_libusb_close;
 	}
 out:
+	return ret;
+
+out_libusb_close:
+	libusb_close((*dev)->usb_device);
+	(*dev)->usb_device = NULL;
 	return ret;
 }
 
