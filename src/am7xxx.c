@@ -702,6 +702,59 @@ static am7xxx_device *find_device(am7xxx_context *ctx,
 	return current;
 }
 
+static int open_device(am7xxx_context *ctx,
+		       unsigned int device_index,
+		       libusb_device* usb_dev,
+		       am7xxx_device **dev)
+{
+	int ret;
+
+	*dev = find_device(ctx, device_index);
+	if (*dev == NULL) {
+		ret = -ENODEV;
+		goto out;
+	}
+
+	/* the usb device has already been opened */
+	if ((*dev)->usb_device) {
+		debug(ctx, "(*dev)->usb_device already set\n");
+		ret = 1;
+		goto out;
+	}
+
+	ret = libusb_open(usb_dev, &((*dev)->usb_device));
+	if (ret < 0) {
+		debug(ctx, "libusb_open failed\n");
+		goto out;
+	}
+
+	/* XXX, the device is now open, if any of the calls below fail we need
+	 * to close it again before bailing out.
+	 */
+
+	ret = libusb_set_configuration((*dev)->usb_device,
+				       (*dev)->desc->configuration);
+	if (ret < 0) {
+		debug(ctx, "libusb_set_configuration failed\n");
+		debug(ctx, "Cannot set configuration %hhu\n",
+		      (*dev)->desc->configuration);
+		goto out_libusb_close;
+	}
+
+	ret = libusb_claim_interface((*dev)->usb_device,
+				     (*dev)->desc->interface_number);
+	if (ret < 0) {
+		debug(ctx, "libusb_claim_interface failed\n");
+		debug(ctx, "Cannot claim interface %hhu\n",
+		      (*dev)->desc->interface_number);
+out_libusb_close:
+		libusb_close((*dev)->usb_device);
+		(*dev)->usb_device = NULL;
+	}
+out:
+	return ret;
+}
+
 typedef enum {
 	SCAN_OP_BUILD_DEVLIST,
 	SCAN_OP_OPEN_DEVICE,
@@ -780,48 +833,12 @@ static int scan_devices(am7xxx_context *ctx, scan_op op,
 				} else if (op == SCAN_OP_OPEN_DEVICE &&
 					   current_index == open_device_index) {
 
-					*dev = find_device(ctx, open_device_index);
-					if (*dev == NULL) {
-						ret = -ENODEV;
-						goto out;
-					}
-
-					/* the usb device has already been opened */
-					if ((*dev)->usb_device) {
-						debug(ctx, "(*dev)->usb_device already set\n");
-						ret = 1;
-						goto out;
-					}
-
-					ret = libusb_open(list[i], &((*dev)->usb_device));
+					ret = open_device(ctx,
+							  open_device_index,
+							  list[i],
+							  dev);
 					if (ret < 0) {
-						debug(ctx, "libusb_open failed\n");
-						goto out;
-					}
-
-					/* XXX, the device is now open, if any
-					 * of the calls below fail we need to
-					 * close it again before bailing out.
-					 */
-
-					ret = libusb_set_configuration((*dev)->usb_device,
-								       (*dev)->desc->configuration);
-					if (ret < 0) {
-						debug(ctx, "libusb_set_configuration failed\n");
-						debug(ctx, "Cannot set configuration %hhu\n",
-						      (*dev)->desc->configuration);
-						goto out_libusb_close;
-					}
-
-					ret = libusb_claim_interface((*dev)->usb_device,
-								     (*dev)->desc->interface_number);
-					if (ret < 0) {
-						debug(ctx, "libusb_claim_interface failed\n");
-						debug(ctx, "Cannot claim interface %hhu\n",
-						      (*dev)->desc->interface_number);
-out_libusb_close:
-						libusb_close((*dev)->usb_device);
-						(*dev)->usb_device = NULL;
+						debug(ctx, "open_device failed\n");
 						goto out;
 					}
 
