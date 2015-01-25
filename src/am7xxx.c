@@ -772,8 +772,9 @@ typedef enum {
  *
  * When 'op' == SCAN_OP_OPEN_DEVICE the function opens the supported USB
  * device with index 'open_device_index' and returns the correspondent
- * am7xxx_device in the 'dev' parameter; the function returns 0 on success,
- * 1 if the device was already open and a negative value on error.
+ * am7xxx_device in the 'dev' parameter; the function returns the value from
+ * open_device(), which is 0 on success, 1 if the device was already open and
+ * a negative value on error.
  *
  * NOTES:
  * if scan_devices() fails when called with 'op' == SCAN_OP_BUILD_DEVLIST,
