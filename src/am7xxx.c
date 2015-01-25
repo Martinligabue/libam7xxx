@@ -832,7 +832,8 @@ out_libusb_close:
 		}
 	}
 
-	/* if we made it up to here we didn't find any device to open */
+	/* if we made it up to here when op == SCAN_OP_OPEN_DEVICE,
+	 * no devices to open had been found. */
 	if (op == SCAN_OP_OPEN_DEVICE) {
 		error(ctx, "Cannot find any device to open\n");
 		ret = -ENODEV;
