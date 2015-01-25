@@ -837,11 +837,12 @@ static int scan_devices(am7xxx_context *ctx, scan_op op,
 							  open_device_index,
 							  list[i],
 							  dev);
-					if (ret < 0) {
+					if (ret < 0)
 						debug(ctx, "open_device failed\n");
-						goto out;
-					}
 
+					/* exit the loop unconditionally after
+					 * attempting to open the device
+					 * requested by the user */
 					goto out;
 				}
 				current_index++;
