@@ -767,13 +767,13 @@ typedef enum {
  * This is where the central logic of multi-device support is.
  *
  * When 'op' == SCAN_OP_BUILD_DEVLIST the parameters 'open_device_index' and
- * 'dev' are ignored; the function returns 0 on success and a negative value
+ * 'dev' are ignored; the function returns 0 on success or a negative value
  * on error.
  *
  * When 'op' == SCAN_OP_OPEN_DEVICE the function opens the supported USB
  * device with index 'open_device_index' and returns the correspondent
  * am7xxx_device in the 'dev' parameter; the function returns the value from
- * open_device(), which is 0 on success, 1 if the device was already open and
+ * open_device(), which is 0 on success, 1 if the device was already open or
  * a negative value on error.
  *
  * NOTES:
