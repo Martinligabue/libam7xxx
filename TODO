@@ -4,3 +4,4 @@
   (this may not be necessary if the GStreamer sink works well enough).
 - If there will ever be an API breakage, consider using more portable types
   (e.g.  off_t for file sizes, size_t for counters, etc.)
+- uniform the style of if() checks in cmake files
