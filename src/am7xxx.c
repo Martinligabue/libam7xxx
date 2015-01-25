@@ -385,8 +385,8 @@ static int read_data(am7xxx_device *dev, uint8_t *buffer, unsigned int len)
 
 	ret = libusb_bulk_transfer(dev->usb_device, 0x81, buffer, len, &transferred, 0);
 	if (ret != 0 || (unsigned int)transferred != len) {
-		error(dev->ctx, "ret: %d\ttransferred: %d (expected %u)\n",
-		      ret, transferred, len);
+		error(dev->ctx, "%s. Transferred: %d (expected %u)\n",
+		      libusb_error_name(ret), transferred, len);
 		return ret;
 	}
 
@@ -404,8 +404,8 @@ static int send_data(am7xxx_device *dev, uint8_t *buffer, unsigned int len)
 
 	ret = libusb_bulk_transfer(dev->usb_device, 0x1, buffer, len, &transferred, 0);
 	if (ret != 0 || (unsigned int)transferred != len) {
-		error(dev->ctx, "ret: %d\ttransferred: %d (expected %u)\n",
-		      ret, transferred, len);
+		error(dev->ctx, "%s. Transferred: %d (expected %u)\n",
+		      libusb_error_name(ret), transferred, len);
 		return ret;
 	}
 
@@ -725,7 +725,7 @@ static int open_device(am7xxx_context *ctx,
 
 	ret = libusb_open(usb_dev, &((*dev)->usb_device));
 	if (ret < 0) {
-		debug(ctx, "libusb_open failed\n");
+		debug(ctx, "libusb_open failed: %s\n", libusb_error_name(ret));
 		goto out;
 	}
 
@@ -739,7 +739,8 @@ static int open_device(am7xxx_context *ctx,
 		ret = libusb_set_configuration((*dev)->usb_device,
 					       (*dev)->desc->configuration);
 		if (ret < 0) {
-			debug(ctx, "libusb_set_configuration failed\n");
+			debug(ctx, "libusb_set_configuration failed: %s\n",
+			      libusb_error_name(ret));
 			debug(ctx, "Cannot set configuration %hhu\n",
 			      (*dev)->desc->configuration);
 			goto out_libusb_close;
@@ -751,7 +752,8 @@ static int open_device(am7xxx_context *ctx,
 	ret = libusb_claim_interface((*dev)->usb_device,
 				     (*dev)->desc->interface_number);
 	if (ret < 0) {
-		debug(ctx, "libusb_claim_interface failed\n");
+		debug(ctx, "libusb_claim_interface failed: %s\n",
+		      libusb_error_name(ret));
 		debug(ctx, "Cannot claim interface %hhu\n",
 		      (*dev)->desc->interface_number);
 		goto out_libusb_close;
