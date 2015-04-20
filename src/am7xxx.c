@@ -734,7 +734,14 @@ static int open_device(am7xxx_context *ctx,
 	 */
 
 	current_configuration = -1;
-	libusb_get_configuration((*dev)->usb_device, &current_configuration);
+	ret = libusb_get_configuration((*dev)->usb_device,
+				       &current_configuration);
+	if (ret < 0) {
+		debug(ctx, "libusb_get_configuration failed: %s\n",
+		      libusb_error_name(ret));
+		goto out_libusb_close;
+	}
+
 	if (current_configuration != (*dev)->desc->configuration) {
 		/*
 		 * In principle kernel drivers bound to each interface should
@@ -772,7 +779,14 @@ static int open_device(am7xxx_context *ctx,
 	 * http://libusb.sourceforge.net/api-1.0/caveats.html
 	 */
 	current_configuration = -1;
-	libusb_get_configuration((*dev)->usb_device, &current_configuration);
+	ret = libusb_get_configuration((*dev)->usb_device,
+				       &current_configuration);
+	if (ret < 0) {
+		debug(ctx, "libusb_get_configuration after claim failed: %s\n",
+		      libusb_error_name(ret));
+		goto out_libusb_close;
+	}
+
 	if (current_configuration != (*dev)->desc->configuration) {
 		debug(ctx, "libusb configuration changed (expected: %hhu, current: %hhu\n",
 		      (*dev)->desc->configuration, current_configuration);
