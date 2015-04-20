@@ -736,6 +736,15 @@ static int open_device(am7xxx_context *ctx,
 	current_configuration = -1;
 	libusb_get_configuration((*dev)->usb_device, &current_configuration);
 	if (current_configuration != (*dev)->desc->configuration) {
+		/*
+		 * In principle kernel drivers bound to each interface should
+		 * be detached before setting the configuration, but in
+		 * practice this is not necessary for most devices.
+		 *
+		 * For example something like the following function would be
+		 * called:
+		 * 	libusb_detach_all_kernel_drivers((*dev)->usb_device);
+		 */
 		ret = libusb_set_configuration((*dev)->usb_device,
 					       (*dev)->desc->configuration);
 		if (ret < 0) {
