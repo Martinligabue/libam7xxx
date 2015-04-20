@@ -774,9 +774,9 @@ static int open_device(am7xxx_context *ctx,
 	current_configuration = -1;
 	libusb_get_configuration((*dev)->usb_device, &current_configuration);
 	if (current_configuration != (*dev)->desc->configuration) {
-		debug(ctx, "libusb configuration changed\n");
-		debug(ctx, "Cannot claim interface %hhu\n",
-		      (*dev)->desc->interface_number);
+		debug(ctx, "libusb configuration changed (expected: %hhu, current: %hhu\n",
+		      (*dev)->desc->configuration, current_configuration);
+		ret = -EINVAL;
 		goto out_libusb_close;
 	}
 out:
