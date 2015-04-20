@@ -386,7 +386,7 @@ static int am7xxx_play(const char *input_format_string,
 		if (got_picture) {
 			/* convert it to YUV */
 			sws_scale(sw_scale_ctx,
-				  (const uint8_t * const*)picture_raw->data,
+				  (const uint8_t * const *)picture_raw->data,
 				  picture_raw->linesize,
 				  0,
 				  (input_ctx.codec_ctx)->height,

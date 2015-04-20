@@ -704,7 +704,7 @@ static am7xxx_device *find_device(am7xxx_context *ctx,
 
 static int open_device(am7xxx_context *ctx,
 		       unsigned int device_index,
-		       libusb_device* usb_dev,
+		       libusb_device *usb_dev,
 		       am7xxx_device **dev)
 {
 	int ret;
@@ -806,7 +806,7 @@ static int scan_devices(am7xxx_context *ctx, scan_op op,
 			unsigned int open_device_index, am7xxx_device **dev)
 {
 	ssize_t num_devices;
-	libusb_device** list;
+	libusb_device **list;
 	unsigned int current_index;
 	int i;
 	int ret;
