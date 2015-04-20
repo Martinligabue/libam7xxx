@@ -784,18 +784,21 @@ static int open_device(am7xxx_context *ctx,
 	if (ret < 0) {
 		debug(ctx, "libusb_get_configuration after claim failed: %s\n",
 		      libusb_error_name(ret));
-		goto out_libusb_close;
+		goto out_libusb_release_interface;
 	}
 
 	if (current_configuration != (*dev)->desc->configuration) {
 		debug(ctx, "libusb configuration changed (expected: %hhu, current: %hhu\n",
 		      (*dev)->desc->configuration, current_configuration);
 		ret = -EINVAL;
-		goto out_libusb_close;
+		goto out_libusb_release_interface;
 	}
 out:
 	return ret;
 
+out_libusb_release_interface:
+	libusb_release_interface((*dev)->usb_device,
+				 (*dev)->desc->interface_number);
 out_libusb_close:
 	libusb_close((*dev)->usb_device);
 	(*dev)->usb_device = NULL;
