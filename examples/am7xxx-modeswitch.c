@@ -42,7 +42,7 @@ int main(void)
 	if (ret < 0)
 		goto out;
 
-	libusb_set_debug(NULL, 3);
+	libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_INFO);
 
 	usb_device = libusb_open_device_with_vid_pid(NULL,
 						     AM7XXX_STORAGE_VID,
