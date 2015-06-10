@@ -664,7 +664,7 @@ static am7xxx_device *add_new_device(am7xxx_context *ctx,
 
 	new_device = malloc(sizeof(*new_device));
 	if (new_device == NULL) {
-		fatal("cannot allocate a new device (%s)\n", strerror(errno));
+		debug(ctx, "cannot allocate a new device (%s)\n", strerror(errno));
 		return NULL;
 	}
 	memset(new_device, 0, sizeof(*new_device));
