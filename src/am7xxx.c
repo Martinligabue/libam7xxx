@@ -744,13 +744,24 @@ static int open_device(am7xxx_context *ctx,
 
 	if (current_configuration != (*dev)->desc->configuration) {
 		/*
-		 * In principle kernel drivers bound to each interface should
-		 * be detached before setting the configuration, but in
-		 * practice this is not necessary for most devices.
+		 * In principle, before setting a new configuration, kernel
+		 * drivers should be detached from _all_ interfaces; for
+		 * example calling something like the following "invented"
+		 * function _before_ setting the new configuration:
 		 *
-		 * For example something like the following function would be
-		 * called:
-		 * 	libusb_detach_all_kernel_drivers((*dev)->usb_device);
+		 *   libusb_detach_all_kernel_drivers((*dev)->usb_device);
+		 *
+		 * However, in practice, this is not necessary for most
+		 * devices as they have only one configuration.
+		 *
+		 * When a device only has one configuration:
+		 *
+		 *   - if there was a kernel driver bound to the device, it
+		 *     had already set the configuration and the call below
+		 *     will be skipped;
+		 *
+		 *   - if no kernel driver was bound to the device, the call
+		 *     below will suceed.
 		 */
 		ret = libusb_set_configuration((*dev)->usb_device,
 					       (*dev)->desc->configuration);
