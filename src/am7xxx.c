@@ -720,7 +720,6 @@ static int open_device(am7xxx_context *ctx,
 
 	/* the usb device has already been opened */
 	if ((*dev)->usb_device) {
-		debug(ctx, "(*dev)->usb_device already set\n");
 		ret = 1;
 		goto out;
 	}
