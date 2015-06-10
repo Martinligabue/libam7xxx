@@ -1101,8 +1101,10 @@ AM7XXX_PUBLIC int am7xxx_init(am7xxx_context **ctx)
 	(*ctx)->log_level = AM7XXX_LOG_TRACE;
 
 	ret = libusb_init(&((*ctx)->usb_context));
-	if (ret < 0)
+	if (ret < 0) {
+		error(*ctx, "libusb_init failed: %s\n", libusb_error_name(ret));
 		goto out_free_context;
+	}
 
 	libusb_set_debug((*ctx)->usb_context, LIBUSB_LOG_LEVEL_INFO);
 
