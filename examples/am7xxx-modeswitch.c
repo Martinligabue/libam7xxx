@@ -17,6 +17,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 #include <libusb.h>
 
@@ -39,8 +40,11 @@ int main(void)
 	unsigned int len;
 
 	ret = libusb_init(NULL);
-	if (ret < 0)
+	if (ret < 0) {
+		fprintf(stderr, "libusb_init failed: %s\n",
+			libusb_error_name(ret));
 		goto out;
+	}
 
 	libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_INFO);
 
@@ -48,14 +52,17 @@ int main(void)
 						     AM7XXX_STORAGE_VID,
 						     AM7XXX_STORAGE_PID);
 	if (usb_device == NULL) {
-		fprintf(stderr, "cannot open the device: %d.\n", errno);
+		fprintf(stderr, "libusb_open failed: %s\n", strerror(errno));
 		ret = -errno;
 		goto out;
 	}
 
 	ret = libusb_set_configuration(usb_device, AM7XXX_STORAGE_CONFIGURATION);
 	if (ret < 0) {
-		fprintf(stderr, "cannot set configuration.\n");
+		fprintf(stderr, "libusb_set_configuration failed: %s\n",
+			libusb_error_name(ret));
+		fprintf(stderr, "Cannot set configuration %hhu\n",
+			AM7XXX_STORAGE_CONFIGURATION);
 		goto out_libusb_close;
 	}
 
@@ -63,7 +70,10 @@ int main(void)
 
 	ret = libusb_claim_interface(usb_device, AM7XXX_STORAGE_INTERFACE);
 	if (ret < 0) {
-		fprintf(stderr, "cannot claim interface.\n");
+		fprintf(stderr, "libusb_claim_interface failed: %s\n",
+			libusb_error_name(ret));
+		fprintf(stderr, "Cannot claim interface %hhu\n",
+			AM7XXX_STORAGE_INTERFACE);
 		goto out_libusb_close;
 	}
 
