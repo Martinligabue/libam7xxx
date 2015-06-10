@@ -489,8 +489,8 @@ static int send_data_async(am7xxx_device *dev, uint8_t *buffer, unsigned int len
 
 	/* Make a copy of the buffer so the caller can safely reuse it just
 	 * after libusb_submit_transfer() has returned. This technique
-	 * requires more allocations than a proper double-buffering approach
-	 * but it takes a lot less code. */
+	 * requires more dynamic allocations compared to a proper
+	 * double-buffering approach but it takes a lot less code. */
 	transfer_buffer = malloc(len);
 	if (transfer_buffer == NULL) {
 		error(dev->ctx, "cannot allocate transfer buffer (%s)\n",
