@@ -381,8 +381,9 @@ static void trace_dump_buffer(am7xxx_context *ctx, const char *message,
 static int read_data(am7xxx_device *dev, uint8_t *buffer, unsigned int len)
 {
 	int ret;
-	int transferred = 0;
+	int transferred;
 
+	transferred = 0;
 	ret = libusb_bulk_transfer(dev->usb_device, 0x81, buffer, len, &transferred, 0);
 	if (ret != 0 || (unsigned int)transferred != len) {
 		error(dev->ctx, "%s. Transferred: %d (expected %u)\n",
@@ -398,10 +399,11 @@ static int read_data(am7xxx_device *dev, uint8_t *buffer, unsigned int len)
 static int send_data(am7xxx_device *dev, uint8_t *buffer, unsigned int len)
 {
 	int ret;
-	int transferred = 0;
+	int transferred;
 
 	trace_dump_buffer(dev->ctx, "sending -->", buffer, len);
 
+	transferred = 0;
 	ret = libusb_bulk_transfer(dev->usb_device, 0x1, buffer, len, &transferred, 0);
 	if (ret != 0 || (unsigned int)transferred != len) {
 		error(dev->ctx, "%s. Transferred: %d (expected %u)\n",
