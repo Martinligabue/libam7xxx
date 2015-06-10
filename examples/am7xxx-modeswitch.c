@@ -34,10 +34,9 @@ static unsigned char switch_command[] =
 int main(void)
 {
 	int ret;
-	int transferred;
 	libusb_device_handle *usb_device;
-
 	unsigned int len;
+	int transferred;
 
 	ret = libusb_init(NULL);
 	if (ret < 0) {
