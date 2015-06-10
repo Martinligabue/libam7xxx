@@ -107,6 +107,7 @@ int main(void)
 	}
 
 	len = sizeof(switch_command);
+
 	transferred = 0;
 	ret = libusb_bulk_transfer(usb_device, AM7XXX_STORAGE_OUT_EP,
 				   switch_command, len, &transferred, 0);
