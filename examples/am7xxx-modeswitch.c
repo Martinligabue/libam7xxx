@@ -53,20 +53,13 @@ int main(void)
 		goto out;
 	}
 
-	if (libusb_kernel_driver_active(usb_device, AM7XXX_STORAGE_INTERFACE)) {
-		ret = libusb_detach_kernel_driver(usb_device,
-						  AM7XXX_STORAGE_INTERFACE);
-		if (ret < 0)
-			fprintf(stderr, "Warning: cannot detach kernel driver.\n");
-	} else {
-		fprintf(stderr, "kernel driver not active.\n");
-	}
-
 	ret = libusb_set_configuration(usb_device, AM7XXX_STORAGE_CONFIGURATION);
 	if (ret < 0) {
 		fprintf(stderr, "cannot set configuration.\n");
 		goto out_libusb_close;
 	}
+
+	libusb_set_auto_detach_kernel_driver(usb_device, 1);
 
 	ret = libusb_claim_interface(usb_device, AM7XXX_STORAGE_INTERFACE);
 	if (ret < 0) {
