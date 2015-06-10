@@ -53,7 +53,7 @@
 
 static void log_message(am7xxx_context *ctx,
 			int level,
-			const char *function,
+			const char *function_name,
 			int line,
 			const char *fmt,
 			...) __attribute__ ((format (printf, 5, 6)));
@@ -628,7 +628,7 @@ static int send_command(am7xxx_device *dev, am7xxx_packet_type type)
  * set up */
 static void log_message(am7xxx_context *ctx,
 			int level,
-			const char *function,
+			const char *function_name,
 			int line,
 			const char *fmt,
 			...)
@@ -636,8 +636,8 @@ static void log_message(am7xxx_context *ctx,
 	va_list ap;
 
 	if (level == AM7XXX_LOG_FATAL || (ctx && level <= ctx->log_level)) {
-		if (function) {
-			fprintf(stderr, "%s", function);
+		if (function_name) {
+			fprintf(stderr, "%s", function_name);
 			if (line)
 				fprintf(stderr, "[%d]", line);
 			fprintf(stderr, ": ");
