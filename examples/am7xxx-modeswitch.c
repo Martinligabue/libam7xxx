@@ -35,6 +35,7 @@ int main(void)
 {
 	int ret;
 	libusb_device_handle *usb_device;
+	int current_configuration;
 	unsigned int len;
 	int transferred;
 
@@ -56,13 +57,24 @@ int main(void)
 		goto out;
 	}
 
-	ret = libusb_set_configuration(usb_device, AM7XXX_STORAGE_CONFIGURATION);
+	current_configuration = -1;
+	ret = libusb_get_configuration(usb_device, &current_configuration);
 	if (ret < 0) {
-		fprintf(stderr, "libusb_set_configuration failed: %s\n",
+		fprintf(stderr, "libusb_get_configuration failed: %s\n",
 			libusb_error_name(ret));
-		fprintf(stderr, "Cannot set configuration %hhu\n",
-			AM7XXX_STORAGE_CONFIGURATION);
 		goto out_libusb_close;
+	}
+
+	if (current_configuration != AM7XXX_STORAGE_CONFIGURATION) {
+		ret = libusb_set_configuration(usb_device,
+					       AM7XXX_STORAGE_CONFIGURATION);
+		if (ret < 0) {
+			fprintf(stderr, "libusb_set_configuration failed: %s\n",
+				libusb_error_name(ret));
+			fprintf(stderr, "Cannot set configuration %hhu\n",
+				AM7XXX_STORAGE_CONFIGURATION);
+			goto out_libusb_close;
+		}
 	}
 
 	libusb_set_auto_detach_kernel_driver(usb_device, 1);
@@ -74,6 +86,24 @@ int main(void)
 		fprintf(stderr, "Cannot claim interface %hhu\n",
 			AM7XXX_STORAGE_INTERFACE);
 		goto out_libusb_close;
+	}
+
+	/* Checking that the configuration has not changed, as suggested in
+	 * http://libusb.sourceforge.net/api-1.0/caveats.html
+	 */
+	current_configuration = -1;
+	ret = libusb_get_configuration(usb_device, &current_configuration);
+	if (ret < 0) {
+		fprintf(stderr, "libusb_get_configuration after claim failed: %s\n",
+			libusb_error_name(ret));
+		goto out_libusb_release_interface;
+	}
+
+	if (current_configuration != AM7XXX_STORAGE_CONFIGURATION) {
+		fprintf(stderr, "libusb configuration changed (expected: %hhu, current: %hhu\n",
+			AM7XXX_STORAGE_CONFIGURATION, current_configuration);
+		ret = -EINVAL;
+		goto out_libusb_release_interface;
 	}
 
 	len = sizeof(switch_command);
