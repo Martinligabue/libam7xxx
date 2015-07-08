@@ -341,7 +341,7 @@ static inline unsigned int in_80chars(unsigned int i)
 {
 	/* The 3 below is the length of "xx " where xx is the hex string
 	 * representation of a byte */
-	return ((i+1) % (80/3));
+	return ((i + 1) % (80 / 3));
 }
 
 static void trace_dump_buffer(am7xxx_context *ctx, const char *message,
