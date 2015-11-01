@@ -216,7 +216,7 @@ static int video_output_init(struct video_output_ctx *output_ctx,
 	 */
 	if (image_format == AM7XXX_IMAGE_FORMAT_NV12) {
 		fprintf(stdout, "using raw output format\n");
-		output_codec_ctx->pix_fmt    = PIX_FMT_NV12;
+		output_codec_ctx->pix_fmt    = AV_PIX_FMT_NV12;
 		output_ctx->codec_ctx = output_codec_ctx;
 		output_ctx->raw_output = 1;
 		ret = 0;
