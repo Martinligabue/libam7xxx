@@ -800,7 +800,7 @@ static int open_device(am7xxx_context *ctx,
 	}
 
 	if (current_configuration != (*dev)->desc->configuration) {
-		debug(ctx, "libusb configuration changed (expected: %hhu, current: %hhu\n",
+		debug(ctx, "libusb configuration changed (expected: %hhu, current: %d\n",
 		      (*dev)->desc->configuration, current_configuration);
 		ret = -EINVAL;
 		goto out_libusb_release_interface;

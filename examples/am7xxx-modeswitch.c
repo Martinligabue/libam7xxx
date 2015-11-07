@@ -71,7 +71,7 @@ int main(void)
 		if (ret < 0) {
 			fprintf(stderr, "libusb_set_configuration failed: %s\n",
 				libusb_error_name(ret));
-			fprintf(stderr, "Cannot set configuration %hhu\n",
+			fprintf(stderr, "Cannot set configuration %d\n",
 				AM7XXX_STORAGE_CONFIGURATION);
 			goto out_libusb_close;
 		}
@@ -83,7 +83,7 @@ int main(void)
 	if (ret < 0) {
 		fprintf(stderr, "libusb_claim_interface failed: %s\n",
 			libusb_error_name(ret));
-		fprintf(stderr, "Cannot claim interface %hhu\n",
+		fprintf(stderr, "Cannot claim interface %d\n",
 			AM7XXX_STORAGE_INTERFACE);
 		goto out_libusb_close;
 	}
@@ -100,7 +100,7 @@ int main(void)
 	}
 
 	if (current_configuration != AM7XXX_STORAGE_CONFIGURATION) {
-		fprintf(stderr, "libusb configuration changed (expected: %hhu, current: %hhu\n",
+		fprintf(stderr, "libusb configuration changed (expected: %d, current: %d\n",
 			AM7XXX_STORAGE_CONFIGURATION, current_configuration);
 		ret = -EINVAL;
 		goto out_libusb_release_interface;
