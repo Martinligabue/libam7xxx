@@ -435,7 +435,7 @@ static int am7xxx_play(const char *input_format_string,
 						      out_picture,
 						      out_picture_size);
 			if (ret < 0) {
-				perror("am7xxx_send_image");
+				perror("am7xxx_send_image_async");
 				run = 0;
 				goto end_while;
 			}
