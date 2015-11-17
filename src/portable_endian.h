@@ -1,4 +1,4 @@
-/* 
+/*
  * Public domain, stripped down version of:
  * https://gist.github.com/panzi/6856583
  */

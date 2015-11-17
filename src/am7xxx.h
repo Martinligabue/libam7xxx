@@ -252,7 +252,7 @@ int am7xxx_send_image(am7xxx_device *dev,
  * This is the function that actually makes the device display something.
  * Static pictures can be sent just once and the device will keep showing them
  * until another image get sent or some command resets or turns off the display.
- * 
+ *
  * @note This _async() variant makes a copy of the image buffer, so the caller
  * is free to reuse the buffer just after the function returns.
  *
