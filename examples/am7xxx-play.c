@@ -276,7 +276,8 @@ static int am7xxx_play(const char *input_format_string,
 		       unsigned int upscale,
 		       unsigned int quality,
 		       am7xxx_image_format image_format,
-		       am7xxx_device *dev)
+		       am7xxx_device *dev,
+		       int dump_frame)
 {
 	struct video_input_ctx input_ctx;
 	struct video_output_ctx output_ctx;
@@ -420,15 +421,19 @@ static int am7xxx_play(const char *input_format_string,
 			}
 
 #ifdef DEBUG
-			char filename[NAME_MAX];
-			FILE *file;
-			if (!output_ctx.raw_output)
-				snprintf(filename, NAME_MAX, "out_q%03d.jpg", quality);
-			else
-				snprintf(filename, NAME_MAX, "out.raw");
-			file = fopen(filename, "wb");
-			fwrite(out_picture, 1, out_picture_size, file);
-			fclose(file);
+			if (dump_frame) {
+				char filename[NAME_MAX];
+				FILE *file;
+				if (!output_ctx.raw_output)
+					snprintf(filename, NAME_MAX, "out_q%03d.jpg", quality);
+				else
+					snprintf(filename, NAME_MAX, "out.raw");
+				file = fopen(filename, "wb");
+				fwrite(out_picture, 1, out_picture_size, file);
+				fclose(file);
+			}
+#else
+			(void) dump_frame;
 #endif
 
 			ret = am7xxx_send_image_async(dev,
@@ -597,6 +602,9 @@ static void usage(char *name)
 	printf("usage: %s [OPTIONS]\n\n", name);
 	printf("OPTIONS:\n");
 	printf("\t-d <index>\t\tthe device index (default is 0)\n");
+#ifdef DEBUG
+	printf("\t-D \t\t\tdump the last frame to a file (only active in DEBUG mode)\n");
+#endif
 	printf("\t-f <input format>\tthe input device format\n");
 	printf("\t-i <input path>\t\tthe input path\n");
 	printf("\t-o <options>\t\ta comma separated list of input format options\n");
@@ -644,8 +652,9 @@ int main(int argc, char *argv[])
 	int format = AM7XXX_IMAGE_FORMAT_JPEG;
 	am7xxx_context *ctx;
 	am7xxx_device *dev;
+	int dump_frame = 0;
 
-	while ((opt = getopt(argc, argv, "d:f:i:o:s:uF:q:l:p:z:h")) != -1) {
+	while ((opt = getopt(argc, argv, "d:Df:i:o:s:uF:q:l:p:z:h")) != -1) {
 		switch (opt) {
 		case 'd':
 			device_index = atoi(optarg);
@@ -654,6 +663,12 @@ int main(int argc, char *argv[])
 				ret = -EINVAL;
 				goto out;
 			}
+			break;
+		case 'D':
+			dump_frame = 1;
+#ifndef DEBUG
+			fprintf(stderr, "Warning: the -D option is only active in DEBUG mode.\n");
+#endif
 			break;
 		case 'f':
 			input_format_string = strdup(optarg);
@@ -853,7 +868,8 @@ int main(int argc, char *argv[])
 			  upscale,
 			  quality,
 			  format,
-			  dev);
+			  dev,
+			  dump_frame);
 	if (ret < 0) {
 		fprintf(stderr, "am7xxx_play failed\n");
 		goto cleanup;
