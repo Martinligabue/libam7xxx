@@ -320,6 +320,9 @@ static int am7xxx_play(const char *input_format_string,
 		ret = -ENOMEM;
 		goto cleanup_picture_raw;
 	}
+	picture_scaled->format = (output_ctx.codec_ctx)->pix_fmt;
+	picture_scaled->width = (output_ctx.codec_ctx)->width;
+	picture_scaled->height = (output_ctx.codec_ctx)->height;
 
 	/* calculate the bytes needed for the output image and create buffer for the output image */
 	out_buf_size = avpicture_get_size((output_ctx.codec_ctx)->pix_fmt,
