@@ -1261,7 +1261,6 @@ AM7XXX_PUBLIC int am7xxx_calc_scaled_image_dimensions(am7xxx_device *dev,
 					unsigned int *scaled_width,
 					unsigned int *scaled_height)
 {
-
 	am7xxx_device_info device_info;
 	float width_ratio;
 	float height_ratio;
