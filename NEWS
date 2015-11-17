@@ -1,3 +1,25 @@
+News for v0.1.6:
+================
+
+  * Fix some ffmpeg compile time deprecation warnings in am7xxx-play
+  * Fix some fmmpeg runtime warnings
+  * Don't dump the last frame unconditionally in am7xxx-play when in DEBUG
+    mode, add an option to enable the frame dump, but this is only active in
+    DEBUG mode
+  * Fix some compilation warnings from clang
+  * Replace deprecated FFmpeg API symbol PIX_FMT_NV12 in am7xx-play (Thanks to
+    Andreas Cadhalpun)
+  * Fix the Length field in the switch command in am7xxx-modeswitch (Thanks to
+    Balasubramanian S)
+  * More robust handling of USB configurations
+  * More robust handling of kernel driver detachment (Thanks to Andrea
+    Console)
+  * Minor documentation cleanups
+  * Minor build system improvements (am7xxx-play can now build without XCB,
+    but some functionalities will not be available)
+  * Misc code cleanups
+  * Relicense the example under GPL-3+
+
 News for v0.1.5:
 ================
 
