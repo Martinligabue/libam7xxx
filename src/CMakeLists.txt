@@ -1,5 +1,5 @@
 add_definitions("-D_BSD_SOURCE") # for htole32()
-add_definitions("-D_POSIX_C_SOURCE=199309L") # for nanosleep()
+add_definitions("-D_POSIX_C_SOURCE=200112L") # for nanosleep() and lroundf()
 
 # Find packages needed to build library
 find_package(libusb-1.0 REQUIRED)
