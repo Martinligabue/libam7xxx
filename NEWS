@@ -7,8 +7,8 @@ News for v0.1.6:
     mode, add an option to enable the frame dump, but this is only active in
     DEBUG mode
   * Fix some compilation warnings from clang
-  * Replace deprecated FFmpeg API symbol PIX_FMT_NV12 in am7xx-play (Thanks to
-    Andreas Cadhalpun)
+  * Replace deprecated FFmpeg API symbol PIX_FMT_NV12 in am7xxx-play (Thanks
+    to Andreas Cadhalpun)
   * Fix the Length field in the switch command in am7xxx-modeswitch (Thanks to
     Balasubramanian S)
   * More robust handling of USB configurations
