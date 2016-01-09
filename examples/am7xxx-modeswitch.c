@@ -101,7 +101,7 @@ int main(void)
 	}
 
 	if (current_configuration != AM7XXX_STORAGE_CONFIGURATION) {
-		fprintf(stderr, "libusb configuration changed (expected: %d, current: %d\n",
+		fprintf(stderr, "libusb configuration changed (expected: %d, current: %d)\n",
 			AM7XXX_STORAGE_CONFIGURATION, current_configuration);
 		ret = -EINVAL;
 		goto out_libusb_release_interface;
