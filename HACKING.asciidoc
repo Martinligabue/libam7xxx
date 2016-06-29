@@ -17,7 +17,8 @@ On a Debian based system, the dependencies can be installed with this command:
                           libavformat-dev \
                           libavcodec-dev \
                           libavdevice-dev \
-                          libswscale-dev
+                          libswscale-dev \
+                          libxcb1-dev
 
 With libav/ffmpeg version previous than 0.9 this patch is needed:
 http://git.ao2.it/libam7xxx.git/blob_plain/refs/heads/debian:/debian/patches/0001-Revert-am7xxx-play-switch-to-avcodec_encode_video2.patch
