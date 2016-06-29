@@ -388,7 +388,11 @@ static int am7xxx_play(const char *input_format_string,
 
 		/* if we got the complete frame */
 		if (got_picture) {
-			/* convert it to YUV */
+			/* 
+			 * Rescaling the picture also changes its pixel format
+			 * to the raw format supported by the projector if
+			 * this was set in video_output_init()
+			 */
 			sws_scale(sw_scale_ctx,
 				  (const uint8_t * const *)picture_raw->data,
 				  picture_raw->linesize,
