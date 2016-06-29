@@ -548,7 +548,7 @@ static char *get_x_screen_size(const char *input_path)
 static char *get_x_screen_size(const char *input_path)
 {
 	(void) input_path;
-	fprintf(stderr, "%s: fallback implementation\n", __func__);
+	fprintf(stderr, "%s: fallback implementation, assuming a vga screen\n", __func__);
 	return strdup("vga");
 }
 #endif
