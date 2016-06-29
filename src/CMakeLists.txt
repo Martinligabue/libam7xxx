@@ -1,4 +1,4 @@
-add_definitions("-D_BSD_SOURCE") # for htole32()
+add_definitions("-D_DEFAULT_SOURCE") # for htole32()
 add_definitions("-D_POSIX_C_SOURCE=200112L") # for nanosleep() and lroundf()
 
 # Find packages needed to build library
