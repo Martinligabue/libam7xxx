@@ -1,7 +1,5 @@
 include(CheckSymbolExists)
-add_definitions("-D_POSIX_C_SOURCE=2") # for getopt()
-add_definitions("-D_POSIX_SOURCE") # for sigaction
-add_definitions("-D_BSD_SOURCE") # for strdup
+add_definitions("-D_POSIX_C_SOURCE=200809L") # for getopt(), sigaction(), and strdup()
 
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 
