@@ -1093,8 +1093,7 @@ AM7XXX_PUBLIC int am7xxx_init(am7xxx_context **ctx)
 	*ctx = malloc(sizeof(**ctx));
 	if (*ctx == NULL) {
 		fatal("cannot allocate the context (%s)\n", strerror(errno));
-		ret = -ENOMEM;
-		goto out;
+		return -ENOMEM;
 	}
 	memset(*ctx, 0, sizeof(**ctx));
 
