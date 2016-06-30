@@ -31,6 +31,7 @@
 
 #include <libavdevice/avdevice.h>
 #include <libavformat/avformat.h>
+#include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 
 #include <am7xxx.h>
@@ -326,9 +327,10 @@ static int am7xxx_play(const char *input_format_string,
 	picture_scaled->height = (output_ctx.codec_ctx)->height;
 
 	/* calculate the bytes needed for the output image and create buffer for the output image */
-	out_buf_size = avpicture_get_size((output_ctx.codec_ctx)->pix_fmt,
-					  (output_ctx.codec_ctx)->width,
-					  (output_ctx.codec_ctx)->height);
+	out_buf_size = av_image_get_buffer_size((output_ctx.codec_ctx)->pix_fmt,
+						(output_ctx.codec_ctx)->width,
+						(output_ctx.codec_ctx)->height,
+						1);
 	out_buf = av_malloc(out_buf_size * sizeof(uint8_t));
 	if (out_buf == NULL) {
 		fprintf(stderr, "cannot allocate output data buffer!\n");
