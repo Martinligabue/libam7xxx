@@ -339,11 +339,13 @@ static int am7xxx_play(const char *input_format_string,
 	}
 
 	/* assign appropriate parts of buffer to image planes in picture_scaled */
-	avpicture_fill((AVPicture *)picture_scaled,
-		       out_buf,
-		       (output_ctx.codec_ctx)->pix_fmt,
-		       (output_ctx.codec_ctx)->width,
-		       (output_ctx.codec_ctx)->height);
+	av_image_fill_arrays(picture_scaled->data,
+			     picture_scaled->linesize,
+			     out_buf,
+			     (output_ctx.codec_ctx)->pix_fmt,
+			     (output_ctx.codec_ctx)->width,
+			     (output_ctx.codec_ctx)->height,
+			     1);
 
 	sw_scale_ctx = sws_getCachedContext(NULL,
 					    (input_ctx.codec_ctx)->width,
