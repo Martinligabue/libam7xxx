@@ -1179,14 +1179,14 @@ AM7XXX_PUBLIC int am7xxx_open_device(am7xxx_context *ctx, am7xxx_device **dev,
 	 * is the first one to be sent to the device in order for it to
 	 * successfully return the correct device information.
 	 *
-	 * So, if there is not a cached version of it (from a previous open),
-	 * we ask for device info at open time,
+	 * NOTE: am7xxx_get_device_info() will fetch the actual device info
+	 * from the device only the very first time it's called for a given
+	 * device, otherwise, it'll return a cached version of the device info
+	 * (from a previous call to am7xxx_open_device(), for instance).
 	 */
-	if ((*dev)->device_info == NULL) {
-		ret = am7xxx_get_device_info(*dev, NULL);
-		if (ret < 0)
-			error(ctx, "cannot get device info\n");
-	}
+	ret = am7xxx_get_device_info(*dev, NULL);
+	if (ret < 0)
+		error(ctx, "cannot get device info\n");
 
 out:
 	return ret;
