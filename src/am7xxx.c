@@ -1213,10 +1213,9 @@ AM7XXX_PUBLIC int am7xxx_get_device_info(am7xxx_device *dev,
 	int ret;
 	struct am7xxx_header h;
 
-	if (dev->device_info) {
-		memcpy(device_info, dev->device_info, sizeof(*device_info));
-		return 0;
-	}
+	/* if there is a cached copy of the device info, just return that */
+	if (dev->device_info)
+		goto return_value;
 
 	ret = send_command(dev, AM7XXX_PACKET_TYPE_DEVINFO);
 	if (ret < 0)
@@ -1250,6 +1249,9 @@ AM7XXX_PUBLIC int am7xxx_get_device_info(am7xxx_device *dev,
 	dev->device_info->unknown1 = h.header_data.devinfo.unknown1;
 #endif
 
+return_value:
+	if (device_info)
+		memcpy(device_info, dev->device_info, sizeof(*device_info));
 	return 0;
 }
 
