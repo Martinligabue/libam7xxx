@@ -1,0 +1,114 @@
+HOW-TO use a PicoPix on GNU/Linux
+=================================
+
+Philips/SagemCom pico projectors, like for instance the PicoPix 2055, usually
+have a WVGA (854 x 480 pixels) native resolution, however they can be used to
+project other resolutions if the software rescales the image.
+
+First, update your system and download the free libam7xxx library and the
+related programs.
+
+On Debian and Ubuntu systems this can be done with the following commands:
+
+  sudo apt-get update
+  sudo apt-get install libam7xxx0.1-bin
+
+Plug your PicoPix into one or two USB slots of your personal computer
+(sometimes the second USB port is needed to ensure that the PicoPix has enough
+power).
+
+Wait for Philips logo to appear.
+
+After the logo has disappeared, execute the following command in a terminal:
+
+  am7xxx-play -f x11grab -i :0.0
+
+The video projection is on.
+
+You can have two simple scripts to execute the program from the GUI.
+
+PicoPix-START.sh:
+
+  #!/bin/sh
+  am7xxx-play -f x11grab -i :0.0 -p 1 -z 0
+
+
+PicoPix-STOP.sh:
+
+  #!/bin/sh
+  killall am7xxx-play
+  am7xxx-play -f x11grab -i :0.0 -p 0 -z 1 &
+  sleep 1
+  killall am7xxx-play
+
+
+Save the shell scripts from above in files, and give the execute permissions
+to the owner (or user group) via the command line  or via the graphical
+interface
+(http://sourcedigit.com/20111-how-to-run-a-shell-file-in-ubuntu-run-sh-file-in-ubuntu/).
+You will then be able to execute the file by double-clicking on it.
+
+If you want to specify a particular resolution you can pass it as a command
+line option:
+
+  am7xxx-play -f x11grab -i :0.0 -o video_size=1280x768
+
+When doing so you may notice that your PicoPix does not fully displays the
+content of your desktop screen, which can be truncated at the bottom and at
+the right. This is because of the WXGA (1280 x 768 pixels) resolution may be
+different from your personal computer screen resolution. It is therefore
+necessary to modify —temporarily— your personal computer screen resolution to
+wanted resolution. Take the following script :
+
+  #!/bin/sh
+
+  WIDTH=1280
+  HEIGHT=768
+
+  OUTPUT="LVDS-1" # See 'xrandr --listmonitors'
+
+  xrandr --newmode $(gtf ${WIDTH} ${HEIGHT} 60 | sed -ne 's/"//g;s/ Modeline //p')
+  xrandr --addmode ${OUTPUT} ${WIDTH}x${HEIGHT}_60.00
+  xrandr --output ${OUTPUT} --mode ${WIDTH}x${HEIGHT}_60.00
+  sleep 1
+  am7xxx-play -f x11grab -i :0.0 -p 1 -z 0 -o video_size=${WIDTH}x${HEIGHT}
+
+Note:
+
+In the example above, the personal computer screen is identified as "LVDS-1".
+Maybe your computer screen has a different identifier. In this case, you will
+have to replace "LVDS-1" with the correct identifier : open your terminal,
+type "xrandr" and the terminal will list and describe your different screen
+devices (more about xrandr utility here:
+http://pkg-xorg.alioth.debian.org/howto/use-xrandr.html).
+
+Also, in order to give back your computer screen its original resolution, you
+should create a PicoPix-STOP.sh script like so:
+
+  #!/bin/sh
+
+  ORIGINAL_WIDTH=1600
+  ORIGINAL_HEIGHT=900
+
+  OUTPUT="LVDS-1" # See 'xrandr --listmonitors'
+
+  killall am7xxx-play
+  am7xxx-play -f x11grab -i :0.0 -p 0 -z 1 &
+  sleep 1
+  killall am7xxx-play
+  xrandr --output ${OUTPUT} --mode ${ORIGINAL_WIDTH}x${ORIGINAL_HEIGHT}
+
+Note:
+
+In the example above, the original screen resolution is 1600x900 pixels. You
+have to change this value and put your screen resolution value which you can
+know via xrandr. Same for LVDS-1.
+
+Once your video projection is over, you can execute the PicoPix-STOP.sh script
+so that your computer screen returns to its original state.
+
+You can then unplug the projector.
+
+That's all folks!
+
+This text is licensed under WTFPL. See http://www.wtfpl.net/ for more informations.
