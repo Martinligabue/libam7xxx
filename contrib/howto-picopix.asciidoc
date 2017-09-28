@@ -25,7 +25,8 @@ After the logo has disappeared, execute the following command in a terminal:
 
 The video projection is on.
 
-You can have two simple scripts to execute the program from the GUI.
+You can have two simple scripts to execute and terminate the program from
+a graphical interface.
 
 PicoPix-START.sh:
 
@@ -58,7 +59,9 @@ content of your desktop screen, which can be truncated at the bottom and at
 the right. This is because of the WXGA (1280 x 768 pixels) resolution may be
 different from your personal computer screen resolution. It is therefore
 necessary to modify —temporarily— your personal computer screen resolution to
-wanted resolution. Take the following script :
+wanted resolution.
+
+Take the following script:
 
   #!/bin/sh
 
@@ -77,13 +80,13 @@ Note:
 
 In the example above, the personal computer screen is identified as "LVDS-1".
 Maybe your computer screen has a different identifier. In this case, you will
-have to replace "LVDS-1" with the correct identifier : open your terminal,
+have to replace "LVDS-1" with the correct identifier: open your terminal,
 type "xrandr" and the terminal will list and describe your different screen
 devices (more about xrandr utility here:
 http://pkg-xorg.alioth.debian.org/howto/use-xrandr.html).
 
 Also, in order to give back your computer screen its original resolution, you
-should create a PicoPix-STOP.sh script like so:
+should create a PicoPix-STOP.sh script like the following:
 
   #!/bin/sh
 
