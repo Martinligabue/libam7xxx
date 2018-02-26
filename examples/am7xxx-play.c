@@ -238,7 +238,7 @@ static int video_output_init(struct video_output_ctx *output_ctx,
 	output_codec_ctx->qmin       = output_codec_ctx->qmax = ((100 - (quality - 1)) * FF_QUALITY_SCALE) / 100;
 	output_codec_ctx->mb_lmin    = output_codec_ctx->qmin * FF_QP2LAMBDA;
 	output_codec_ctx->mb_lmax    = output_codec_ctx->qmax * FF_QP2LAMBDA;
-	output_codec_ctx->flags      |= CODEC_FLAG_QSCALE;
+	output_codec_ctx->flags      |= AV_CODEC_FLAG_QSCALE;
 	output_codec_ctx->global_quality = output_codec_ctx->qmin * FF_QP2LAMBDA;
 
 	/* find the encoder */
