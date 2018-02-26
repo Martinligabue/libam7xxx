@@ -19,7 +19,7 @@ if(BUILD_AM7XXX-PLAY)
   set(CMAKE_REQUIRED_LIBRARIES ${FFMPEG_LIBRARIES})
   set(CMAKE_REQUIRED_INCLUDES ${FFMPEG_LIBAVFORMAT_INCLUDE_DIRS})
   check_symbol_exists(avformat_open_input
-    "${FFMPEG_LIBAVFORMAT_INCLUDE_DIRS}/libavformat/avformat.h"
+    "libavformat/avformat.h"
     HAVE_AVFORMAT_OPEN_INPUT)
   if(NOT HAVE_AVFORMAT_OPEN_INPUT)
     message(FATAL_ERROR
