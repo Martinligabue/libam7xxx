@@ -1,6 +1,6 @@
 /* am7xxx - communication with AM7xxx based USB Pico Projectors and DPFs
  *
- * Copyright (C) 2014  Antonio Ospite <ao2@ao2.it>
+ * Copyright (C) 2014-2018  Antonio Ospite <ao2@ao2.it>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <errno.h>
 #include <time.h>
+#endif
 
 #include "tools.h"
 
@@ -30,6 +34,9 @@
  */
 int msleep(unsigned long msecs)
 {
+#ifdef _WIN32
+	Sleep(msecs);
+#else
 	struct timespec delay;
 	int ret;
 
@@ -43,6 +50,7 @@ int msleep(unsigned long msecs)
 	}
 	if (ret == -1)
 		return ret;
+#endif
 
 	return 0;
 }
