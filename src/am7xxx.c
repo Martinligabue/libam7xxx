@@ -30,11 +30,12 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
-/* If we're not using GNU C, elide __attribute__
+/*
+ * If we're not using GNU C, elide __attribute__
  * taken from: http://unixwiz.net/techtips/gnu-c-attributes.html)
  */
 #ifndef __GNUC__
-#  define  __attribute__(x)  /* NOTHING */
+	#define  __attribute__(x)  /* NOTHING */
 #endif
 
 /* Control shared library symbols visibility */
