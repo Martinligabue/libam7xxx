@@ -414,7 +414,7 @@ static int send_data(am7xxx_device *dev, uint8_t *buffer, unsigned int len)
 	return 0;
 }
 
-static void send_data_async_complete_cb(struct libusb_transfer *transfer)
+static void LIBUSB_CALL send_data_async_complete_cb(struct libusb_transfer *transfer)
 {
 	am7xxx_device *dev = (am7xxx_device *)(transfer->user_data);
 	int *completed = &(dev->transfer_completed);
