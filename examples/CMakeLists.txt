@@ -16,7 +16,7 @@ endif()
 option(BUILD_AM7XXX-PLAY "Build a more complete example: am7xxx-play" TRUE)
 if(BUILD_AM7XXX-PLAY)
   find_package(FFmpeg REQUIRED)
-  set(CMAKE_REQUIRED_LIBRARIES ${FFMPEG_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES ${FFMPEG_LIBAVFORMAT_LIBRARIES})
   set(CMAKE_REQUIRED_INCLUDES ${FFMPEG_LIBAVFORMAT_INCLUDE_DIRS})
   check_symbol_exists(avformat_open_input
     "libavformat/avformat.h"
