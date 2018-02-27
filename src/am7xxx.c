@@ -1240,8 +1240,8 @@ AM7XXX_PUBLIC int am7xxx_get_device_info(am7xxx_device *dev,
 	if (h.packet_type != AM7XXX_PACKET_TYPE_DEVINFO) {
 		error(dev->ctx, "expected packet type: %d, got %d instead!\n",
 		      AM7XXX_PACKET_TYPE_DEVINFO, h.packet_type);
-		errno = ENOTSUP;
-		return -ENOTSUP;
+		errno = EINVAL;
+		return -EINVAL;
 	}
 
 	dev->device_info = malloc(sizeof(*dev->device_info));
