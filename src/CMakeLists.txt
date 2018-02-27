@@ -1,6 +1,10 @@
 add_definitions("-D_DEFAULT_SOURCE") # for htole32()
 add_definitions("-D_POSIX_C_SOURCE=200112L") # for nanosleep() and lroundf()
 
+# Express a preference for C99 format strings when using MinGW, see:
+# https://sourceforge.net/p/mingw-w64/wiki2/gnu%20printf/
+add_definitions("-D__USE_MINGW_ANSI_STDIO=1")
+
 # Find packages needed to build library
 find_package(libusb-1.0 REQUIRED)
 include_directories(${LIBUSB_1_INCLUDE_DIRS})

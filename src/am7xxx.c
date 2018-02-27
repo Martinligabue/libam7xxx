@@ -38,6 +38,16 @@
 	#define  __attribute__(x)  /* NOTHING */
 #endif
 
+/*
+ * Fix printf format when compiling for Windows with MinGW, see:
+ * https://sourceforge.net/p/mingw-w64/wiki2/gnu%20printf/
+ */
+#ifdef __MINGW_PRINTF_FORMAT
+	#define AM7XXX_PRINTF_FORMAT __MINGW_PRINTF_FORMAT
+#else
+	#define AM7XXX_PRINTF_FORMAT printf
+#endif
+
 /* Control shared library symbols visibility */
 #if defined _WIN32 || defined __CYGWIN__
 	#define AM7XXX_PUBLIC __declspec(dllexport)
@@ -57,7 +67,7 @@ static void log_message(am7xxx_context *ctx,
 			const char *function_name,
 			int line,
 			const char *fmt,
-			...) __attribute__ ((format (printf, 5, 6)));
+			...) __attribute__ ((format (AM7XXX_PRINTF_FORMAT, 5, 6)));
 
 #define fatal(...)        log_message(NULL, AM7XXX_LOG_FATAL,   __func__, __LINE__, __VA_ARGS__)
 #define error(ctx, ...)   log_message(ctx,  AM7XXX_LOG_ERROR,   __func__, __LINE__, __VA_ARGS__)
