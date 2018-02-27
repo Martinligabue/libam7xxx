@@ -36,13 +36,6 @@
 
 #include <am7xxx.h>
 
-/* On some systems ENOTSUP is not defined, fallback to its value on
- * linux which is equal to EOPNOTSUPP which is 95
- */
-#ifndef ENOTSUP
-#define ENOTSUP 95
-#endif
-
 static unsigned int run = 1;
 
 struct video_input_ctx {
@@ -114,7 +107,7 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 		}
 	if (video_index == -1) {
 		fprintf(stderr, "cannot find any video streams\n");
-		ret = -ENOTSUP;
+		ret = -EINVAL;
 		goto cleanup;
 	}
 
@@ -122,7 +115,7 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 	input_codec_ctx = input_format_ctx->streams[video_index]->codec;
 	if (input_codec_ctx == NULL) {
 		fprintf(stderr, "input codec context is not valid\n");
-		ret = -ENOTSUP;
+		ret = -EINVAL;
 		goto cleanup;
 	}
 
@@ -130,7 +123,7 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 	input_codec = avcodec_find_decoder(input_codec_ctx->codec_id);
 	if (input_codec == NULL) {
 		fprintf(stderr, "input_codec is NULL!\n");
-		ret = -ENOTSUP;
+		ret = -EINVAL;
 		goto cleanup;
 	}
 
@@ -138,7 +131,7 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 	ret = avcodec_open2(input_codec_ctx, input_codec, NULL);
 	if (ret < 0) {
 		fprintf(stderr, "cannot open input codec\n");
-		ret = -ENOTSUP;
+		ret = -EINVAL;
 		goto cleanup;
 	}
 
@@ -245,7 +238,7 @@ static int video_output_init(struct video_output_ctx *output_ctx,
 	output_codec = avcodec_find_encoder(output_codec_ctx->codec_id);
 	if (output_codec == NULL) {
 		fprintf(stderr, "cannot find output codec!\n");
-		ret = -ENOTSUP;
+		ret = -EINVAL;
 		goto cleanup;
 	}
 
