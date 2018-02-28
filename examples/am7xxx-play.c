@@ -55,7 +55,6 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 	AVCodecContext *input_codec_ctx;
 	AVCodec *input_codec;
 	int video_index;
-	unsigned int i;
 	int ret;
 
 	avdevice_register_all();
@@ -100,25 +99,9 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 	av_dump_format(input_format_ctx, 0, input_path, 0);
 
 	/* look for the first video_stream */
-	video_index = -1;
-	for (i = 0; i < input_format_ctx->nb_streams; i++)
-		if (input_format_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-			video_index = i;
-			break;
-		}
-	if (video_index == -1) {
+	video_index = av_find_best_stream(input_format_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, &input_codec, 0);
+	if (video_index < 0) {
 		fprintf(stderr, "cannot find any video streams\n");
-		ret = -EINVAL;
-		goto cleanup;
-	}
-
-	/* get a pointer to the codec parameters for the video stream */
-	input_codec_params = input_format_ctx->streams[video_index]->codecpar;
-
-	/* find the decoder for the video stream */
-	input_codec = avcodec_find_decoder(input_codec_params->codec_id);
-	if (input_codec == NULL) {
-		fprintf(stderr, "input_codec is NULL!\n");
 		ret = -EINVAL;
 		goto cleanup;
 	}
@@ -130,6 +113,7 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 		goto cleanup;
 	}
 
+	input_codec_params = input_format_ctx->streams[video_index]->codecpar;
 	ret = avcodec_parameters_to_context(input_codec_ctx, input_codec_params);
 	if (ret < 0) {
 		fprintf(stderr, "cannot copy parameters to input codec context\n");
