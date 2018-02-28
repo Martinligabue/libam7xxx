@@ -266,7 +266,6 @@ static int video_output_init(struct video_output_ctx *output_ctx,
 	goto out;
 
 cleanup:
-	avcodec_close(output_codec_ctx);
 	avcodec_free_context(&output_codec_ctx);
 out:
 	return ret;
