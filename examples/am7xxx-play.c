@@ -267,7 +267,7 @@ static int video_output_init(struct video_output_ctx *output_ctx,
 
 cleanup:
 	avcodec_close(output_codec_ctx);
-	av_free(output_codec_ctx);
+	avcodec_free_context(&output_codec_ctx);
 out:
 	return ret;
 }
@@ -474,11 +474,11 @@ cleanup_picture_raw:
 	av_frame_free(&picture_raw);
 
 cleanup_output:
-	/* av_free is needed as well,
-	 * see http://libav.org/doxygen/master/avcodec_8h.html#a5d7440cd7ea195bd0b14f21a00ef36dd
+	/* Freeing the codec context is needed as well,
+	 * see https://libav.org/documentation/doxygen/master/group__lavc__core.html#gaf4daa92361efb3523ef5afeb0b54077f
 	 */
 	avcodec_close(output_ctx.codec_ctx);
-	av_free(output_ctx.codec_ctx);
+	avcodec_free_context(&(output_ctx.codec_ctx));
 
 cleanup_input:
 	avcodec_close(input_ctx.codec_ctx);
