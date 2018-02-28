@@ -126,7 +126,6 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 	ret = avcodec_open2(input_codec_ctx, input_codec, NULL);
 	if (ret < 0) {
 		fprintf(stderr, "cannot open input codec\n");
-		ret = -EINVAL;
 		goto cleanup;
 	}
 
