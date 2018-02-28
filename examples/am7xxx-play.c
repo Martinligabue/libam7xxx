@@ -211,6 +211,7 @@ static int video_output_init(struct video_output_ctx *output_ctx,
 		goto out;
 	}
 
+	/* YUVJ420P is deprecated in swscaler, but mjpeg still relies on it. */
 	output_codec_ctx->pix_fmt    = AV_PIX_FMT_YUVJ420P;
 	output_codec_ctx->codec_id   = AV_CODEC_ID_MJPEG;
 	output_codec_ctx->codec_type = AVMEDIA_TYPE_VIDEO;
