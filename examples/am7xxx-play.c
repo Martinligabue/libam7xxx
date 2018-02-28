@@ -256,6 +256,67 @@ out:
 }
 
 
+/*
+ * Wrap the new avcodec API from FFMpeg 3.1 to minimize the changes in the
+ * user code.
+ *
+ * If the use of the wrappers were to be made conditional, a check like the
+ * following could be used:
+ *
+ *	#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101))
+ *
+ * As derived from the APIchanges document:
+ * https://github.com/FFmpeg/FFmpeg/blob/master/doc/APIchanges
+ *
+ * The wrapper implementation has been taken from:
+ * https://blogs.gentoo.org/lu_zero/2016/03/29/new-avcodec-api/
+ */
+static int decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt)
+{
+	int ret;
+
+	*got_frame = 0;
+
+	if (pkt) {
+		ret = avcodec_send_packet(avctx, pkt);
+		/*
+		 * In particular, we don't expect AVERROR(EAGAIN), because we
+		 * read all decoded frames with avcodec_receive_frame() until
+		 * done.
+		 */
+		if (ret < 0)
+			return ret == AVERROR_EOF ? 0 : ret;
+	}
+
+	ret = avcodec_receive_frame(avctx, frame);
+	if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
+		return ret;
+	if (ret >= 0)
+		*got_frame = 1;
+
+	return 0;
+}
+
+static int encode(AVCodecContext *avctx, AVPacket *pkt, int *got_packet, AVFrame *frame)
+{
+	int ret;
+
+	*got_packet = 0;
+
+	ret = avcodec_send_frame(avctx, frame);
+	if (ret < 0)
+		return ret;
+
+	ret = avcodec_receive_packet(avctx, pkt);
+	if (!ret)
+		*got_packet = 1;
+	if (ret == AVERROR(EAGAIN))
+		return 0;
+
+	return ret;
+}
+
+
 static int am7xxx_play(const char *input_format_string,
 		       AVDictionary **input_options,
 		       const char *input_path,
@@ -369,7 +430,7 @@ static int am7xxx_play(const char *input_format_string,
 
 		/* decode */
 		got_frame = 0;
-		ret = avcodec_decode_video2(input_ctx.codec_ctx, frame_raw, &got_frame, &in_packet);
+		ret = decode(input_ctx.codec_ctx, frame_raw, &got_frame, &in_packet);
 		if (ret < 0) {
 			fprintf(stderr, "cannot decode video\n");
 			run = 0;
@@ -400,10 +461,10 @@ static int am7xxx_play(const char *input_format_string,
 				out_packet.data = NULL;
 				out_packet.size = 0;
 				got_packet = 0;
-				ret = avcodec_encode_video2(output_ctx.codec_ctx,
-							    &out_packet,
-							    frame_scaled,
-							    &got_packet);
+				ret = encode(output_ctx.codec_ctx,
+					     &out_packet,
+					     &got_packet,
+					     frame_scaled);
 				if (ret < 0 || !got_packet) {
 					fprintf(stderr, "cannot encode video\n");
 					run = 0;
