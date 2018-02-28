@@ -113,11 +113,6 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 
 	/* get a pointer to the codec context for the video stream */
 	input_codec_ctx = input_format_ctx->streams[video_index]->codec;
-	if (input_codec_ctx == NULL) {
-		fprintf(stderr, "input codec context is not valid\n");
-		ret = -EINVAL;
-		goto cleanup;
-	}
 
 	/* find the decoder for the video stream */
 	input_codec = avcodec_find_decoder(input_codec_ctx->codec_id);
