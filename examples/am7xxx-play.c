@@ -177,7 +177,7 @@ static int video_output_init(struct video_output_ctx *output_ctx,
 		goto out;
 	}
 
-	/* Calculate the new output dimension so the original picture is shown
+	/* Calculate the new output dimension so the original frame is shown
 	 * in its entirety */
 	ret = am7xxx_calc_scaled_image_dimensions(dev,
 						  upscale,
@@ -268,16 +268,16 @@ static int am7xxx_play(const char *input_format_string,
 {
 	struct video_input_ctx input_ctx;
 	struct video_output_ctx output_ctx;
-	AVFrame *picture_raw;
-	AVFrame *picture_scaled;
+	AVFrame *frame_raw;
+	AVFrame *frame_scaled;
 	int out_buf_size;
 	uint8_t *out_buf;
-	int out_picture_size;
-	uint8_t *out_picture;
+	int out_frame_size;
+	uint8_t *out_frame;
 	struct SwsContext *sw_scale_ctx;
 	AVPacket in_packet;
 	AVPacket out_packet;
-	int got_picture;
+	int got_frame;
 	int got_packet;
 	int ret;
 
@@ -294,23 +294,23 @@ static int am7xxx_play(const char *input_format_string,
 	}
 
 	/* allocate an input frame */
-	picture_raw = av_frame_alloc();
-	if (picture_raw == NULL) {
-		fprintf(stderr, "cannot allocate the raw picture frame!\n");
+	frame_raw = av_frame_alloc();
+	if (frame_raw == NULL) {
+		fprintf(stderr, "cannot allocate the raw frame!\n");
 		ret = -ENOMEM;
 		goto cleanup_output;
 	}
 
 	/* allocate output frame */
-	picture_scaled = av_frame_alloc();
-	if (picture_scaled == NULL) {
-		fprintf(stderr, "cannot allocate the scaled picture!\n");
+	frame_scaled = av_frame_alloc();
+	if (frame_scaled == NULL) {
+		fprintf(stderr, "cannot allocate the scaled frame!\n");
 		ret = -ENOMEM;
-		goto cleanup_picture_raw;
+		goto cleanup_frame_raw;
 	}
-	picture_scaled->format = (output_ctx.codec_ctx)->pix_fmt;
-	picture_scaled->width = (output_ctx.codec_ctx)->width;
-	picture_scaled->height = (output_ctx.codec_ctx)->height;
+	frame_scaled->format = (output_ctx.codec_ctx)->pix_fmt;
+	frame_scaled->width = (output_ctx.codec_ctx)->width;
+	frame_scaled->height = (output_ctx.codec_ctx)->height;
 
 	/* calculate the bytes needed for the output image and create buffer for the output image */
 	out_buf_size = av_image_get_buffer_size((output_ctx.codec_ctx)->pix_fmt,
@@ -321,12 +321,12 @@ static int am7xxx_play(const char *input_format_string,
 	if (out_buf == NULL) {
 		fprintf(stderr, "cannot allocate output data buffer!\n");
 		ret = -ENOMEM;
-		goto cleanup_picture_scaled;
+		goto cleanup_frame_scaled;
 	}
 
-	/* assign appropriate parts of buffer to image planes in picture_scaled */
-	av_image_fill_arrays(picture_scaled->data,
-			     picture_scaled->linesize,
+	/* assign appropriate parts of buffer to image planes in frame_scaled */
+	av_image_fill_arrays(frame_scaled->data,
+			     frame_scaled->linesize,
 			     out_buf,
 			     (output_ctx.codec_ctx)->pix_fmt,
 			     (output_ctx.codec_ctx)->width,
@@ -368,8 +368,8 @@ static int am7xxx_play(const char *input_format_string,
 		}
 
 		/* decode */
-		got_picture = 0;
-		ret = avcodec_decode_video2(input_ctx.codec_ctx, picture_raw, &got_picture, &in_packet);
+		got_frame = 0;
+		ret = avcodec_decode_video2(input_ctx.codec_ctx, frame_raw, &got_frame, &in_packet);
 		if (ret < 0) {
 			fprintf(stderr, "cannot decode video\n");
 			run = 0;
@@ -377,32 +377,32 @@ static int am7xxx_play(const char *input_format_string,
 		}
 
 		/* if we got the complete frame */
-		if (got_picture) {
+		if (got_frame) {
 			/* 
-			 * Rescaling the picture also changes its pixel format
+			 * Rescaling the frame also changes its pixel format
 			 * to the raw format supported by the projector if
 			 * this was set in video_output_init()
 			 */
 			sws_scale(sw_scale_ctx,
-				  (const uint8_t * const *)picture_raw->data,
-				  picture_raw->linesize,
+				  (const uint8_t * const *)frame_raw->data,
+				  frame_raw->linesize,
 				  0,
 				  (input_ctx.codec_ctx)->height,
-				  picture_scaled->data,
-				  picture_scaled->linesize);
+				  frame_scaled->data,
+				  frame_scaled->linesize);
 
 			if (output_ctx.raw_output) {
-				out_picture = out_buf;
-				out_picture_size = out_buf_size;
+				out_frame = out_buf;
+				out_frame_size = out_buf_size;
 			} else {
-				picture_scaled->quality = (output_ctx.codec_ctx)->global_quality;
+				frame_scaled->quality = (output_ctx.codec_ctx)->global_quality;
 				av_init_packet(&out_packet);
 				out_packet.data = NULL;
 				out_packet.size = 0;
 				got_packet = 0;
 				ret = avcodec_encode_video2(output_ctx.codec_ctx,
 							    &out_packet,
-							    picture_scaled,
+							    frame_scaled,
 							    &got_packet);
 				if (ret < 0 || !got_packet) {
 					fprintf(stderr, "cannot encode video\n");
@@ -410,8 +410,8 @@ static int am7xxx_play(const char *input_format_string,
 					goto end_while;
 				}
 
-				out_picture = out_packet.data;
-				out_picture_size = out_packet.size;
+				out_frame = out_packet.data;
+				out_frame_size = out_packet.size;
 			}
 
 #ifdef DEBUG
@@ -423,7 +423,7 @@ static int am7xxx_play(const char *input_format_string,
 				else
 					snprintf(filename, NAME_MAX, "out.raw");
 				file = fopen(filename, "wb");
-				fwrite(out_picture, 1, out_picture_size, file);
+				fwrite(out_frame, 1, out_frame_size, file);
 				fclose(file);
 			}
 #else
@@ -434,8 +434,8 @@ static int am7xxx_play(const char *input_format_string,
 						      image_format,
 						      (output_ctx.codec_ctx)->width,
 						      (output_ctx.codec_ctx)->height,
-						      out_picture,
-						      out_picture_size);
+						      out_frame,
+						      out_frame_size);
 			if (ret < 0) {
 				perror("am7xxx_send_image_async");
 				run = 0;
@@ -451,10 +451,10 @@ end_while:
 	sws_freeContext(sw_scale_ctx);
 cleanup_out_buf:
 	av_free(out_buf);
-cleanup_picture_scaled:
-	av_frame_free(&picture_scaled);
-cleanup_picture_raw:
-	av_frame_free(&picture_raw);
+cleanup_frame_scaled:
+	av_frame_free(&frame_scaled);
+cleanup_frame_raw:
+	av_frame_free(&frame_raw);
 
 cleanup_output:
 	/* Freeing the codec context is needed as well,
