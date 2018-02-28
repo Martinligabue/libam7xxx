@@ -51,6 +51,7 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 {
 	AVInputFormat *input_format = NULL;
 	AVFormatContext *input_format_ctx;
+	AVCodecParameters *input_codec_params;
 	AVCodecContext *input_codec_ctx;
 	AVCodec *input_codec;
 	int video_index;
@@ -101,7 +102,7 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 	/* look for the first video_stream */
 	video_index = -1;
 	for (i = 0; i < input_format_ctx->nb_streams; i++)
-		if (input_format_ctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+		if (input_format_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
 			video_index = i;
 			break;
 		}
@@ -111,22 +112,35 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 		goto cleanup;
 	}
 
-	/* get a pointer to the codec context for the video stream */
-	input_codec_ctx = input_format_ctx->streams[video_index]->codec;
+	/* get a pointer to the codec parameters for the video stream */
+	input_codec_params = input_format_ctx->streams[video_index]->codecpar;
 
 	/* find the decoder for the video stream */
-	input_codec = avcodec_find_decoder(input_codec_ctx->codec_id);
+	input_codec = avcodec_find_decoder(input_codec_params->codec_id);
 	if (input_codec == NULL) {
 		fprintf(stderr, "input_codec is NULL!\n");
 		ret = -EINVAL;
 		goto cleanup;
 	}
 
+	input_codec_ctx = avcodec_alloc_context3(input_codec);
+	if (input_codec_ctx == NULL) {
+		fprintf(stderr, "failed to allocate the input codec context\n");
+		ret = -ENOMEM;
+		goto cleanup;
+	}
+
+	ret = avcodec_parameters_to_context(input_codec_ctx, input_codec_params);
+	if (ret < 0) {
+		fprintf(stderr, "cannot copy parameters to input codec context\n");
+		goto cleanup_ctx;
+	}
+
 	/* open the decoder */
 	ret = avcodec_open2(input_codec_ctx, input_codec, NULL);
 	if (ret < 0) {
 		fprintf(stderr, "cannot open input codec\n");
-		goto cleanup;
+		goto cleanup_ctx;
 	}
 
 	input_ctx->format_ctx = input_format_ctx;
@@ -136,6 +150,8 @@ static int video_input_init(struct video_input_ctx *input_ctx,
 	ret = 0;
 	goto out;
 
+cleanup_ctx:
+	avcodec_free_context(&input_codec_ctx);
 cleanup:
 	avformat_close_input(&input_format_ctx);
 out:
@@ -466,6 +482,7 @@ cleanup_output:
 
 cleanup_input:
 	avcodec_close(input_ctx.codec_ctx);
+	avcodec_free_context(&(input_ctx.codec_ctx));
 	avformat_close_input(&(input_ctx.format_ctx));
 
 out:
