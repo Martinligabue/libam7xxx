@@ -7,8 +7,8 @@ http://kernel.org/doc/Documentation/CodingStyle
 
 === Getting and compiling libam7xxx
 
-libam7xxx depends on 'libusb-1.0' and optionally on 'libav' or 'ffmpeg' for
-its example programs, the build system used is 'cmake'.
+libam7xxx depends on 'libusb-1.0' and optionally on 'libav' or 'ffmpeg' (3.1+)
+for its example programs, the build system used is 'cmake'.
 
 On a Debian based system, the dependencies can be installed with this command:
 
@@ -21,7 +21,7 @@ On a Debian based system, the dependencies can be installed with this command:
                           libxcb1-dev
 
 With libav/ffmpeg version previous than 0.9 this patch is needed:
-http://git.ao2.it/libam7xxx.git/blob_plain/refs/heads/debian:/debian/patches/0001-Revert-am7xxx-play-switch-to-avcodec_encode_video2.patch
+https://git.ao2.it/libam7xxx.git/blob/6d2d8613958e1f0ef011e9d848426086caafe9db:/debian/patches/0002-Revert-am7xxx-play-switch-to-avcodec_encode_video2.patch
 
 The library and the example programs can be compiled following these steps:
 
