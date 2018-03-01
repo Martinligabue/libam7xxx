@@ -1,3 +1,15 @@
+News for v0.1.7:
+================
+
+  * Fix FFMpeg deprecation warnings, the code now depends on FFMpeg 3.1+ 
+  * Fix compilation on Windows
+  * Update the Windows build instructions in HACKING.asciidoc
+  * Add a HOWTO for new users in contrib/howto-picopix.asciidoc
+  * Add a patch to contrib/ to allow compiling libam7xxx on Ubuntu 14.04 LTS
+  * Make sure am7xxx_get_device_info() always returns sensible values
+  * Fix warnings about _BSD_SOURCE deprecation
+  * Misc code and build system cleanups
+
 News for v0.1.6:
 ================
 
