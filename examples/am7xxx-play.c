@@ -440,7 +440,7 @@ static int am7xxx_play(const char *input_format_string,
 
 		/* if we got the complete frame */
 		if (got_frame) {
-			/* 
+			/*
 			 * Rescaling the frame also changes its pixel format
 			 * to the raw format supported by the projector if
 			 * this was set in video_output_init()

@@ -88,7 +88,7 @@ int main(void)
 		goto out_libusb_close;
 	}
 
-	/* 
+	/*
 	 * Checking that the configuration has not changed, as suggested in
 	 * http://libusb.sourceforge.net/api-1.0/caveats.html
 	 */
