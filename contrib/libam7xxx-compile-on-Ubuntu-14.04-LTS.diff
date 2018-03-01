@@ -1,5 +1,18 @@
+diff --git a/examples/am7xxx-modeswitch.c b/examples/am7xxx-modeswitch.c
+index c304515..4f132d6 100644
+--- a/examples/am7xxx-modeswitch.c
++++ b/examples/am7xxx-modeswitch.c
+@@ -46,7 +46,7 @@ int main(void)
+ 		goto out;
+ 	}
+ 
+-	libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_INFO);
++	libusb_set_debug(NULL, 3);
+ 
+ 	usb_device = libusb_open_device_with_vid_pid(NULL,
+ 						     AM7XXX_STORAGE_VID,
 diff --git a/examples/am7xxx-play.c b/examples/am7xxx-play.c
-index 46a91c9..fed455f 100644
+index 81aff84..1ee42e0 100644
 --- a/examples/am7xxx-play.c
 +++ b/examples/am7xxx-play.c
 @@ -31,7 +31,6 @@
@@ -10,26 +23,215 @@ index 46a91c9..fed455f 100644
  #include <libswscale/swscale.h>
  
  #include <am7xxx.h>
-@@ -308,7 +307,7 @@ static int am7xxx_play(const char *input_format_string,
+@@ -51,10 +50,10 @@ static int video_input_init(struct video_input_ctx *input_ctx,
+ {
+ 	AVInputFormat *input_format = NULL;
+ 	AVFormatContext *input_format_ctx;
+-	AVCodecParameters *input_codec_params;
+ 	AVCodecContext *input_codec_ctx;
+ 	AVCodec *input_codec;
+ 	int video_index;
++	unsigned int i;
+ 	int ret;
+ 
+ 	avdevice_register_all();
+@@ -99,32 +98,34 @@ static int video_input_init(struct video_input_ctx *input_ctx,
+ 	av_dump_format(input_format_ctx, 0, input_path, 0);
+ 
+ 	/* look for the first video_stream */
+-	video_index = av_find_best_stream(input_format_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, &input_codec, 0);
+-	if (video_index < 0) {
++	video_index = -1;
++	for (i = 0; i < input_format_ctx->nb_streams; i++)
++		if (input_format_ctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
++			video_index = i;
++			break;
++		}
++	if (video_index == -1) {
+ 		fprintf(stderr, "cannot find any video streams\n");
+ 		ret = -EINVAL;
+ 		goto cleanup;
+ 	}
+ 
+-	input_codec_ctx = avcodec_alloc_context3(input_codec);
+-	if (input_codec_ctx == NULL) {
+-		fprintf(stderr, "failed to allocate the input codec context\n");
+-		ret = -ENOMEM;
+-		goto cleanup;
+-	}
++	/* get a pointer to the codec context for the video stream */
++	input_codec_ctx = input_format_ctx->streams[video_index]->codec;
+ 
+-	input_codec_params = input_format_ctx->streams[video_index]->codecpar;
+-	ret = avcodec_parameters_to_context(input_codec_ctx, input_codec_params);
+-	if (ret < 0) {
+-		fprintf(stderr, "cannot copy parameters to input codec context\n");
+-		goto cleanup_ctx;
++	/* find the decoder for the video stream */
++	input_codec = avcodec_find_decoder(input_codec_ctx->codec_id);
++	if (input_codec == NULL) {
++		fprintf(stderr, "input_codec is NULL!\n");
++		ret = -EINVAL;
++		goto cleanup;
+ 	}
+ 
+ 	/* open the decoder */
+ 	ret = avcodec_open2(input_codec_ctx, input_codec, NULL);
+ 	if (ret < 0) {
+ 		fprintf(stderr, "cannot open input codec\n");
+-		goto cleanup_ctx;
++		goto cleanup;
+ 	}
+ 
+ 	input_ctx->format_ctx = input_format_ctx;
+@@ -134,8 +135,6 @@ static int video_input_init(struct video_input_ctx *input_ctx,
+ 	ret = 0;
+ 	goto out;
+ 
+-cleanup_ctx:
+-	avcodec_free_context(&input_codec_ctx);
+ cleanup:
+ 	avformat_close_input(&input_format_ctx);
+ out:
+@@ -177,7 +176,7 @@ static int video_output_init(struct video_output_ctx *output_ctx,
+ 		goto out;
+ 	}
+ 
+-	/* Calculate the new output dimension so the original frame is shown
++	/* Calculate the new output dimension so the original picture is shown
+ 	 * in its entirety */
+ 	ret = am7xxx_calc_scaled_image_dimensions(dev,
+ 						  upscale,
+@@ -226,7 +225,7 @@ static int video_output_init(struct video_output_ctx *output_ctx,
+ 	output_codec_ctx->qmin       = output_codec_ctx->qmax = ((100 - (quality - 1)) * FF_QUALITY_SCALE) / 100;
+ 	output_codec_ctx->mb_lmin    = output_codec_ctx->qmin * FF_QP2LAMBDA;
+ 	output_codec_ctx->mb_lmax    = output_codec_ctx->qmax * FF_QP2LAMBDA;
+-	output_codec_ctx->flags      |= AV_CODEC_FLAG_QSCALE;
++	output_codec_ctx->flags      |= CODEC_FLAG_QSCALE;
+ 	output_codec_ctx->global_quality = output_codec_ctx->qmin * FF_QP2LAMBDA;
+ 
+ 	/* find the encoder */
+@@ -257,67 +256,6 @@ out:
+ }
+ 
+ 
+-/*
+- * Wrap the new avcodec API from FFMpeg 3.1 to minimize the changes in the
+- * user code.
+- *
+- * If the use of the wrappers were to be made conditional, a check like the
+- * following could be used:
+- *
+- *	#if (LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 48, 101))
+- *
+- * As derived from the APIchanges document:
+- * https://github.com/FFmpeg/FFmpeg/blob/master/doc/APIchanges
+- *
+- * The wrapper implementation has been taken from:
+- * https://blogs.gentoo.org/lu_zero/2016/03/29/new-avcodec-api/
+- */
+-static int decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacket *pkt)
+-{
+-	int ret;
+-
+-	*got_frame = 0;
+-
+-	if (pkt) {
+-		ret = avcodec_send_packet(avctx, pkt);
+-		/*
+-		 * In particular, we don't expect AVERROR(EAGAIN), because we
+-		 * read all decoded frames with avcodec_receive_frame() until
+-		 * done.
+-		 */
+-		if (ret < 0)
+-			return ret == AVERROR_EOF ? 0 : ret;
+-	}
+-
+-	ret = avcodec_receive_frame(avctx, frame);
+-	if (ret < 0 && ret != AVERROR(EAGAIN) && ret != AVERROR_EOF)
+-		return ret;
+-	if (ret >= 0)
+-		*got_frame = 1;
+-
+-	return 0;
+-}
+-
+-static int encode(AVCodecContext *avctx, AVPacket *pkt, int *got_packet, AVFrame *frame)
+-{
+-	int ret;
+-
+-	*got_packet = 0;
+-
+-	ret = avcodec_send_frame(avctx, frame);
+-	if (ret < 0)
+-		return ret;
+-
+-	ret = avcodec_receive_packet(avctx, pkt);
+-	if (!ret)
+-		*got_packet = 1;
+-	if (ret == AVERROR(EAGAIN))
+-		return 0;
+-
+-	return ret;
+-}
+-
+-
+ static int am7xxx_play(const char *input_format_string,
+ 		       AVDictionary **input_options,
+ 		       const char *input_path,
+@@ -330,16 +268,16 @@ static int am7xxx_play(const char *input_format_string,
+ {
+ 	struct video_input_ctx input_ctx;
+ 	struct video_output_ctx output_ctx;
+-	AVFrame *frame_raw;
+-	AVFrame *frame_scaled;
++	AVFrame *picture_raw;
++	AVFrame *picture_scaled;
+ 	int out_buf_size;
+ 	uint8_t *out_buf;
+-	int out_frame_size;
+-	uint8_t *out_frame;
++	int out_picture_size;
++	uint8_t *out_picture;
+ 	struct SwsContext *sw_scale_ctx;
+ 	AVPacket in_packet;
+ 	AVPacket out_packet;
+-	int got_frame;
++	int got_picture;
+ 	int got_packet;
+ 	int ret;
+ 
+@@ -356,44 +294,41 @@ static int am7xxx_play(const char *input_format_string,
  	}
  
  	/* allocate an input frame */
--	picture_raw = av_frame_alloc();
+-	frame_raw = av_frame_alloc();
+-	if (frame_raw == NULL) {
+-		fprintf(stderr, "cannot allocate the raw frame!\n");
 +	picture_raw = avcodec_alloc_frame();
- 	if (picture_raw == NULL) {
- 		fprintf(stderr, "cannot allocate the raw picture frame!\n");
++	if (picture_raw == NULL) {
++		fprintf(stderr, "cannot allocate the raw picture frame!\n");
  		ret = -ENOMEM;
-@@ -316,7 +315,7 @@ static int am7xxx_play(const char *input_format_string,
+ 		goto cleanup_output;
  	}
  
  	/* allocate output frame */
--	picture_scaled = av_frame_alloc();
+-	frame_scaled = av_frame_alloc();
+-	if (frame_scaled == NULL) {
+-		fprintf(stderr, "cannot allocate the scaled frame!\n");
 +	picture_scaled = avcodec_alloc_frame();
- 	if (picture_scaled == NULL) {
- 		fprintf(stderr, "cannot allocate the scaled picture!\n");
++	if (picture_scaled == NULL) {
++		fprintf(stderr, "cannot allocate the scaled picture!\n");
  		ret = -ENOMEM;
-@@ -327,10 +326,9 @@ static int am7xxx_play(const char *input_format_string,
- 	picture_scaled->height = (output_ctx.codec_ctx)->height;
+-		goto cleanup_frame_raw;
++		goto cleanup_picture_raw;
+ 	}
+-	frame_scaled->format = (output_ctx.codec_ctx)->pix_fmt;
+-	frame_scaled->width = (output_ctx.codec_ctx)->width;
+-	frame_scaled->height = (output_ctx.codec_ctx)->height;
++	picture_scaled->format = (output_ctx.codec_ctx)->pix_fmt;
++	picture_scaled->width = (output_ctx.codec_ctx)->width;
++	picture_scaled->height = (output_ctx.codec_ctx)->height;
  
  	/* calculate the bytes needed for the output image and create buffer for the output image */
 -	out_buf_size = av_image_get_buffer_size((output_ctx.codec_ctx)->pix_fmt,
@@ -42,17 +244,20 @@ index 46a91c9..fed455f 100644
  	out_buf = av_malloc(out_buf_size * sizeof(uint8_t));
  	if (out_buf == NULL) {
  		fprintf(stderr, "cannot allocate output data buffer!\n");
-@@ -339,13 +337,11 @@ static int am7xxx_play(const char *input_format_string,
+ 		ret = -ENOMEM;
+-		goto cleanup_frame_scaled;
++		goto cleanup_picture_scaled;
  	}
  
- 	/* assign appropriate parts of buffer to image planes in picture_scaled */
--	av_image_fill_arrays(picture_scaled->data,
--			     picture_scaled->linesize,
+-	/* assign appropriate parts of buffer to image planes in frame_scaled */
+-	av_image_fill_arrays(frame_scaled->data,
+-			     frame_scaled->linesize,
 -			     out_buf,
 -			     (output_ctx.codec_ctx)->pix_fmt,
 -			     (output_ctx.codec_ctx)->width,
 -			     (output_ctx.codec_ctx)->height,
 -			     1);
++	/* assign appropriate parts of buffer to image planes in picture_scaled */
 +	avpicture_fill((AVPicture *)picture_scaled,
 +		       out_buf,
 +		       (output_ctx.codec_ctx)->pix_fmt,
@@ -61,7 +266,95 @@ index 46a91c9..fed455f 100644
  
  	sw_scale_ctx = sws_getCachedContext(NULL,
  					    (input_ctx.codec_ctx)->width,
-@@ -458,17 +454,17 @@ static int am7xxx_play(const char *input_format_string,
+@@ -430,8 +365,8 @@ static int am7xxx_play(const char *input_format_string,
+ 		}
+ 
+ 		/* decode */
+-		got_frame = 0;
+-		ret = decode(input_ctx.codec_ctx, frame_raw, &got_frame, &in_packet);
++		got_picture = 0;
++		ret = avcodec_decode_video2(input_ctx.codec_ctx, picture_raw, &got_picture, &in_packet);
+ 		if (ret < 0) {
+ 			fprintf(stderr, "cannot decode video\n");
+ 			run = 0;
+@@ -439,41 +374,41 @@ static int am7xxx_play(const char *input_format_string,
+ 		}
+ 
+ 		/* if we got the complete frame */
+-		if (got_frame) {
++		if (got_picture) {
+ 			/*
+-			 * Rescaling the frame also changes its pixel format
++			 * Rescaling the picture also changes its pixel format
+ 			 * to the raw format supported by the projector if
+ 			 * this was set in video_output_init()
+ 			 */
+ 			sws_scale(sw_scale_ctx,
+-				  (const uint8_t * const *)frame_raw->data,
+-				  frame_raw->linesize,
++				  (const uint8_t * const *)picture_raw->data,
++				  picture_raw->linesize,
+ 				  0,
+ 				  (input_ctx.codec_ctx)->height,
+-				  frame_scaled->data,
+-				  frame_scaled->linesize);
++				  picture_scaled->data,
++				  picture_scaled->linesize);
+ 
+ 			if (output_ctx.raw_output) {
+-				out_frame = out_buf;
+-				out_frame_size = out_buf_size;
++				out_picture = out_buf;
++				out_picture_size = out_buf_size;
+ 			} else {
+-				frame_scaled->quality = (output_ctx.codec_ctx)->global_quality;
++				picture_scaled->quality = (output_ctx.codec_ctx)->global_quality;
+ 				av_init_packet(&out_packet);
+ 				out_packet.data = NULL;
+ 				out_packet.size = 0;
+ 				got_packet = 0;
+-				ret = encode(output_ctx.codec_ctx,
+-					     &out_packet,
+-					     &got_packet,
+-					     frame_scaled);
++				ret = avcodec_encode_video2(output_ctx.codec_ctx,
++							    &out_packet,
++							    picture_scaled,
++							    &got_packet);
+ 				if (ret < 0 || !got_packet) {
+ 					fprintf(stderr, "cannot encode video\n");
+ 					run = 0;
+ 					goto end_while;
+ 				}
+ 
+-				out_frame = out_packet.data;
+-				out_frame_size = out_packet.size;
++				out_picture = out_packet.data;
++				out_picture_size = out_packet.size;
+ 			}
+ 
+ #ifdef DEBUG
+@@ -485,7 +420,7 @@ static int am7xxx_play(const char *input_format_string,
+ 				else
+ 					snprintf(filename, NAME_MAX, "out.raw");
+ 				file = fopen(filename, "wb");
+-				fwrite(out_frame, 1, out_frame_size, file);
++				fwrite(out_picture, 1, out_picture_size, file);
+ 				fclose(file);
+ 			}
+ #else
+@@ -496,8 +431,8 @@ static int am7xxx_play(const char *input_format_string,
+ 						      image_format,
+ 						      (output_ctx.codec_ctx)->width,
+ 						      (output_ctx.codec_ctx)->height,
+-						      out_frame,
+-						      out_frame_size);
++						      out_picture,
++						      out_picture_size);
+ 			if (ret < 0) {
+ 				perror("am7xxx_send_image_async");
+ 				run = 0;
+@@ -506,17 +441,17 @@ static int am7xxx_play(const char *input_format_string,
  		}
  end_while:
  		if (!output_ctx.raw_output && got_packet)
@@ -74,20 +367,30 @@ index 46a91c9..fed455f 100644
  	sws_freeContext(sw_scale_ctx);
  cleanup_out_buf:
  	av_free(out_buf);
- cleanup_picture_scaled:
--	av_frame_free(&picture_scaled);
+-cleanup_frame_scaled:
+-	av_frame_free(&frame_scaled);
+-cleanup_frame_raw:
+-	av_frame_free(&frame_raw);
++cleanup_picture_scaled:
 +	avcodec_free_frame(&picture_scaled);
- cleanup_picture_raw:
--	av_frame_free(&picture_raw);
++cleanup_picture_raw:
 +	avcodec_free_frame(&picture_raw);
  
  cleanup_output:
- 	/* av_free is needed as well,
+ 	/* Freeing the codec context is needed as well,
+@@ -527,7 +462,6 @@ cleanup_output:
+ 
+ cleanup_input:
+ 	avcodec_close(input_ctx.codec_ctx);
+-	avcodec_free_context(&(input_ctx.codec_ctx));
+ 	avformat_close_input(&(input_ctx.format_ctx));
+ 
+ out:
 diff --git a/src/am7xxx.c b/src/am7xxx.c
-index 84d7e9c..f26fc18 100644
+index 8573a59..fd726af 100644
 --- a/src/am7xxx.c
 +++ b/src/am7xxx.c
-@@ -1106,7 +1106,7 @@ AM7XXX_PUBLIC int am7xxx_init(am7xxx_context **ctx)
+@@ -1117,7 +1117,7 @@ AM7XXX_PUBLIC int am7xxx_init(am7xxx_context **ctx)
  		goto out_free_context;
  	}
  
