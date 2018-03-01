@@ -65,8 +65,15 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
     -Wswitch-enum
     -Wundef
     -Wunreachable-code
-    -Wwrite-strings
-    -fstack-protector)
+    -Wwrite-strings)
+
+  include(CheckCCompilerFlag)
+  CHECK_C_COMPILER_FLAG(-fstack-protector-strong COMPILER_SUPPORTS_STACK_PROTECTOR_STRONG)
+  if (COMPILER_SUPPORTS_STACK_PROTECTOR_STRONG)
+    add_flags(CMAKE_C_FLAGS -fstack-protector-strong)
+  else()
+    add_flags(CMAKE_C_FLAGS -fstack-protector)
+  endif()
 
   add_flags(DEBUG_FLAGS
     -ggdb)
