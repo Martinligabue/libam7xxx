@@ -88,12 +88,13 @@ this needs still needs to be verified.
 All the needed files below must be in the same location:
 
   - 'MinGW32/dll/libusb-1.0.dll' from
-    http://download.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.18/libusb-1.0.18-win.7z
+    https://github.com/libusb/libusb/releases/download/v1.0.21/libusb-1.0.21.7z
 
   - 'libssp-0.dll' from MinGW;
 
-  - all the '*.dll' files from the 'win32/usr/bin/' directory in
-    http://win32.libav.org/releases/libav-9.13-win32.7z
+  - all the '*.dll' files in the 'bin/' directory from
+    https://ffmpeg.zeranoe.com/builds/win32/shared/ffmpeg-3.4.2-win32-shared.zip
+    
 
   - 'am7xxx-modeswitch.exe', 'am7xxx-play.exe', 'libam7xxx.dll' and
     'picoproj.exe' which can all be built by following the instructions in the
