@@ -1,4 +1,4 @@
-From ab3f910957638300224f1f114df6e73115ec86b7 Mon Sep 17 00:00:00 2001
+From bf1163a19667377a1861b38fa64a8cf7ee2d0e40 Mon Sep 17 00:00:00 2001
 From: Antonio Ospite <ao2@ao2.it>
 Date: Tue, 17 Nov 2015 16:28:03 +0100
 Subject: [PATCH] Instrument code with fps-meter
@@ -9,42 +9,30 @@ X-Face: z*RaLf`X<@C75u6Ig9}{oW$H;1_\2t5)({*|jhM<pyWR#k60!#=#>/Vb;]yA5<GWI5`6u&+
 Instrument code with fps-meter:
 http://git.ao2.it/experiments/fps-meter.git/
 ---
- examples/CMakeLists.txt | 2 +-
- examples/am7xxx-play.c  | 5 +++++
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ examples/am7xxx-play.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
-index c563f5f..4bdbdec 100644
---- a/examples/CMakeLists.txt
-+++ b/examples/CMakeLists.txt
-@@ -1,5 +1,5 @@
- include(CheckSymbolExists)
--add_definitions("-D_POSIX_C_SOURCE=2") # for getopt()
-+add_definitions("-D_POSIX_C_SOURCE=200112L") # for clock_gettime()
- add_definitions("-D_POSIX_SOURCE") # for sigaction
- add_definitions("-D_BSD_SOURCE") # for strdup
- 
 diff --git a/examples/am7xxx-play.c b/examples/am7xxx-play.c
-index 6b0d206..271677b 100644
+index 81aff84..4828a9d 100644
 --- a/examples/am7xxx-play.c
 +++ b/examples/am7xxx-play.c
-@@ -34,6 +34,7 @@
+@@ -35,6 +35,7 @@
  #include <libswscale/swscale.h>
  
  #include <am7xxx.h>
 +#include "fps-meter.h"
  
- /* On some systems ENOTSUP is not defined, fallback to its value on
-  * linux which is equal to EOPNOTSUPP which is 95
-@@ -293,6 +294,7 @@ static int am7xxx_play(const char *input_format_string,
- 	int got_picture;
+ static unsigned int run = 1;
+ 
+@@ -342,6 +343,7 @@ static int am7xxx_play(const char *input_format_string,
+ 	int got_frame;
  	int got_packet;
  	int ret;
 +	struct fps_meter_stats stats;
  
  	ret = video_input_init(&input_ctx, input_format_string, input_path, input_options);
  	if (ret < 0) {
-@@ -358,6 +360,8 @@ static int am7xxx_play(const char *input_format_string,
+@@ -410,6 +412,8 @@ static int am7xxx_play(const char *input_format_string,
  		goto cleanup_out_buf;
  	}
  
@@ -53,7 +41,7 @@ index 6b0d206..271677b 100644
  	got_packet = 0;
  	while (run) {
  		/* read packet */
-@@ -447,6 +451,7 @@ static int am7xxx_play(const char *input_format_string,
+@@ -503,6 +507,7 @@ static int am7xxx_play(const char *input_format_string,
  				run = 0;
  				goto end_while;
  			}
@@ -62,5 +50,5 @@ index 6b0d206..271677b 100644
  end_while:
  		if (!output_ctx.raw_output && got_packet)
 -- 
-2.6.2
+2.16.2
 
