@@ -17,7 +17,7 @@ set_target_properties(am7xxx PROPERTIES
   VERSION ${PROJECT_VER}
   SOVERSION ${PROJECT_APIVER})
 install(TARGETS am7xxx
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
 add_library(am7xxx-static STATIC ${SRC})
 set_target_properties(am7xxx-static PROPERTIES OUTPUT_NAME am7xxx)
@@ -25,7 +25,7 @@ if(UNIX AND NOT APPLE)
   set_target_properties(am7xxx-static PROPERTIES COMPILE_FLAGS "-fPIC")
 endif()
 install(TARGETS am7xxx-static
-   DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
 if(NOT WIN32)
   find_library(MATH_LIB m)
@@ -39,11 +39,11 @@ target_link_libraries(am7xxx-static ${MATH_LIB} ${LIBUSB_1_LIBRARIES})
 
 # Install the header files
 install(FILES "am7xxx.h"
-  DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 if(UNIX AND NOT APPLE)
   # Produce a pkg-config file for linking against the shared lib
   configure_file("libam7xxx.pc.in" "libam7xxx.pc" @ONLY)
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/libam7xxx.pc"
-    DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig")
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 endif()

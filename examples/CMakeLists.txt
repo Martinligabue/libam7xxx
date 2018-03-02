@@ -9,7 +9,7 @@ if(BUILD_PICOPROJ)
   add_executable(picoproj picoproj.c)
   target_link_libraries(picoproj am7xxx)
   install(TARGETS picoproj
-    DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 # Build a more complete example
@@ -58,7 +58,7 @@ if(BUILD_AM7XXX-PLAY)
     ${FFMPEG_LIBSWSCALE_LIBRARIES}
     ${OPTIONAL_LIBRARIES})
   install(TARGETS am7xxx-play
-    DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 # Build a simple usb-modeswitch clone for am7xxx devices
@@ -71,6 +71,6 @@ if(BUILD_am7xxx-modeswitch)
   add_executable(am7xxx-modeswitch am7xxx-modeswitch.c)
   target_link_libraries(am7xxx-modeswitch ${LIBUSB_1_LIBRARIES})
   install(TARGETS am7xxx-modeswitch
-    DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 

@@ -20,7 +20,7 @@ if(ASCIIDOC_FOUND)
     ${DOC_OUTPUT_PATH}/man/am7xxx-play.1
     ${DOC_OUTPUT_PATH}/man/am7xxx-modeswitch.1
     ${DOC_OUTPUT_PATH}/man/picoproj.1
-    DESTINATION "${CMAKE_INSTALL_PREFIX}/share/man/man1/"
+    DESTINATION "${CMAKE_INSTALL_MANDIR}/man1/"
     COMPONENT manpages)
 
 endif(ASCIIDOC_FOUND)

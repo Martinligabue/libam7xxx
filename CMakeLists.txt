@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(libam7xxx C)
 
+include (GNUInstallDirs)
+
 set(PROJECT_DESCRIPTION
   "Communication library for Actions Micro AM7XXX based USB projectors and DPFs")
 
