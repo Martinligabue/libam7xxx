@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component>
+  <id>it.ao2.libam7xxx</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <developer_name>Antonio Ospite</developer_name>
+  <url type="homepage">https://ao2.it</url>
+  <update_contact>ao2_AT_ao2.it</update_contact>
+  <name>libam7xxx</name>
+  <summary>Provides a library for accessing am7xxx devices (e.g. Philips PicoPix projectors)</summary>
+  <description>
+    <p>
+      libam7xxx is an Open Source library to communicate with some USB
+      projectors based on the Actions Micro AM7XXX chips.
+    </p>
+    <p>
+      libam7xxx makes it possible to use these devices as USB displays also on
+      non-Windows Operating Systems.
+    </p>
+    <p>
+      Examples of supported devices are:
+      <ul>
+        <li>Acer C110</li>
+        <li>Acer C112</li>
+        <li>Aiptek PocketCinema T25</li>
+        <li>Philips/SagemCom PicoPix 1020</li>
+        <li>Philips/SagemCom PicoPix 2055</li>
+        <li>Philips/SagemCom PicoPix 2330</li>
+        <li>Top-Height/TEC PP700</li>
+      </ul>
+    </p>
+  </description>
+  <provides>
+    <library>libam7xxx.so.0.1</library>
+    <binary>am7xxx-modeswitch</binary>
+    <binary>am7xxx-play</binary>
+    <binary>picoproj</binary>
+    <modalias>usb:v1DE1p1101d*</modalias>
+  </provides>
+</component>
