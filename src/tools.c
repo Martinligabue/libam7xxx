@@ -42,7 +42,8 @@ int msleep(unsigned long msecs)
 
 	delay.tv_sec = msecs / 1000;
 	delay.tv_nsec = (msecs % 1000) * 1000000;
-	while (1) {
+	while (1)
+	{
 		ret = nanosleep(&delay, &delay);
 		if (ret == -1 && errno == EINTR)
 			continue;

@@ -8,53 +8,53 @@
 
 #if (defined(_WIN16) || defined(_WIN32) || defined(_WIN64)) && !defined(__WINDOWS__)
 
-#	define __WINDOWS__
+#define __WINDOWS__
 
 #endif
 
 #if defined(__linux__) || defined(__CYGWIN__)
 
-#	include <endian.h>
+#include <endian.h>
 
 #elif defined(__APPLE__)
 
-#	include <libkern/OSByteOrder.h>
+#include <libkern/OSByteOrder.h>
 
-#	define htole32(x) OSSwapHostToLittleInt32(x)
-#	define le32toh(x) OSSwapLittleToHostInt32(x)
+#define htole32(x) OSSwapHostToLittleInt32(x)
+#define le32toh(x) OSSwapLittleToHostInt32(x)
 
 #elif defined(__OpenBSD__)
 
-#	include <sys/endian.h>
+#include <sys/endian.h>
 
 #elif defined(__NetBSD__) || defined(__FreeBSD__) || defined(__DragonFly__)
 
-#	include <sys/endian.h>
+#include <sys/endian.h>
 
-#	define le32toh(x) letoh32(x)
+#define le32toh(x) letoh32(x)
 
 #elif defined(__WINDOWS__)
 
-#	include <winsock2.h>
-#	include <sys/param.h>
+#include <winsock2.h>
+#include <sys/param.h>
 
-#	if BYTE_ORDER == LITTLE_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
 
-#		define htole32(x) (x)
-#		define le32toh(x) (x)
+#define htole32(x) (x)
+#define le32toh(x) (x)
 
-#	elif BYTE_ORDER == BIG_ENDIAN
+#elif BYTE_ORDER == BIG_ENDIAN
 
-		/* that would be xbox 360 */
+/* that would be xbox 360 */
 
-#		define htole32(x) __builtin_bswap32(x)
-#		define le32toh(x) __builtin_bswap32(x)
+#define htole32(x) __builtin_bswap32(x)
+#define le32toh(x) __builtin_bswap32(x)
 
-#	else
+#else
 
-#		error byte order not supported
+#error byte order not supported
 
-#	endif
+#endif
 
 #else
 

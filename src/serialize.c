@@ -35,8 +35,8 @@ uint32_t get_le32(uint8_t **bufferp)
 {
 	uint32_t tmp;
 
-	memcpy(&tmp, *bufferp, sizeof (tmp));
-	*bufferp += sizeof (tmp);
+	memcpy(&tmp, *bufferp, sizeof(tmp));
+	*bufferp += sizeof(tmp);
 
 	return le32toh(tmp);
 }
@@ -54,8 +54,8 @@ uint8_t *put_le32(uint32_t value, uint8_t **bufferp)
 	uint32_t tmp;
 
 	tmp = htole32(value);
-	memcpy(*bufferp, &tmp, sizeof (tmp));
-	*bufferp += sizeof (tmp);
+	memcpy(*bufferp, &tmp, sizeof(tmp));
+	*bufferp += sizeof(tmp);
 
 	return *bufferp;
 }

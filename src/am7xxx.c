@@ -35,7 +35,7 @@
  * taken from: http://unixwiz.net/techtips/gnu-c-attributes.html)
  */
 #ifndef __GNUC__
-	#define  __attribute__(x)  /* NOTHING */
+#define __attribute__(x) /* NOTHING */
 #endif
 
 /*
@@ -43,49 +43,51 @@
  * https://sourceforge.net/p/mingw-w64/wiki2/gnu%20printf/
  */
 #ifdef __MINGW_PRINTF_FORMAT
-	#define AM7XXX_PRINTF_FORMAT __MINGW_PRINTF_FORMAT
+#define AM7XXX_PRINTF_FORMAT __MINGW_PRINTF_FORMAT
 #else
-	#define AM7XXX_PRINTF_FORMAT printf
+#define AM7XXX_PRINTF_FORMAT printf
 #endif
 
 /* Control shared library symbols visibility */
 #if defined _WIN32 || defined __CYGWIN__
-	#define AM7XXX_PUBLIC __declspec(dllexport)
-	#define AM7XXX_LOCAL
+#define AM7XXX_PUBLIC __declspec(dllexport)
+#define AM7XXX_LOCAL
 #else
-	#if __GNUC__ >= 4
-		#define AM7XXX_PUBLIC __attribute__ ((visibility ("default")))
-		#define AM7XXX_LOCAL  __attribute__ ((visibility ("hidden")))
-	#else
-		#define AM7XXX_PUBLIC
-		#define AM7XXX_LOCAL
-	#endif
+#if __GNUC__ >= 4
+#define AM7XXX_PUBLIC __attribute__((visibility("default")))
+#define AM7XXX_LOCAL __attribute__((visibility("hidden")))
+#else
+#define AM7XXX_PUBLIC
+#define AM7XXX_LOCAL
+#endif
 #endif
 
 static void log_message(am7xxx_context *ctx,
-			int level,
-			const char *function_name,
-			int line,
-			const char *fmt,
-			...) __attribute__ ((format (AM7XXX_PRINTF_FORMAT, 5, 6)));
+						int level,
+						const char *function_name,
+						int line,
+						const char *fmt,
+						...) __attribute__((format(AM7XXX_PRINTF_FORMAT, 5, 6)));
 
-#define fatal(...)        log_message(NULL, AM7XXX_LOG_FATAL,   __func__, __LINE__, __VA_ARGS__)
-#define error(ctx, ...)   log_message(ctx,  AM7XXX_LOG_ERROR,   __func__, __LINE__, __VA_ARGS__)
-#define warning(ctx, ...) log_message(ctx,  AM7XXX_LOG_WARNING, __func__, 0,        __VA_ARGS__)
-#define info(ctx, ...)    log_message(ctx,  AM7XXX_LOG_INFO,    __func__, 0,        __VA_ARGS__)
-#define debug(ctx, ...)   log_message(ctx,  AM7XXX_LOG_DEBUG,   __func__, 0,        __VA_ARGS__)
-#define trace(ctx, ...)   log_message(ctx,  AM7XXX_LOG_TRACE,   NULL,     0,        __VA_ARGS__)
+#define fatal(...) log_message(NULL, AM7XXX_LOG_FATAL, __func__, __LINE__, __VA_ARGS__)
+#define error(ctx, ...) log_message(ctx, AM7XXX_LOG_ERROR, __func__, __LINE__, __VA_ARGS__)
+#define warning(ctx, ...) log_message(ctx, AM7XXX_LOG_WARNING, __func__, 0, __VA_ARGS__)
+#define info(ctx, ...) log_message(ctx, AM7XXX_LOG_INFO, __func__, 0, __VA_ARGS__)
+#define debug(ctx, ...) log_message(ctx, AM7XXX_LOG_DEBUG, __func__, 0, __VA_ARGS__)
+#define trace(ctx, ...) log_message(ctx, AM7XXX_LOG_TRACE, NULL, 0, __VA_ARGS__)
 
-struct am7xxx_ops {
+struct am7xxx_ops
+{
 	int (*set_power_mode)(am7xxx_device *dev, am7xxx_power_mode power);
 	int (*set_zoom_mode)(am7xxx_device *dev, am7xxx_zoom_mode zoom);
 };
 
-struct am7xxx_usb_device_descriptor {
+struct am7xxx_usb_device_descriptor
+{
 	const char *name;
 	uint16_t vendor_id;
 	uint16_t product_id;
-	uint8_t configuration;    /* The bConfigurationValue of the device */
+	uint8_t configuration;	  /* The bConfigurationValue of the device */
 	uint8_t interface_number; /* The bInterfaceNumber of the device */
 	struct am7xxx_ops ops;
 };
@@ -95,49 +97,50 @@ static int picopix_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power);
 static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom);
 static int picopix_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom);
 
-#define DEFAULT_OPS { \
-	.set_power_mode = default_set_power_mode, \
-	.set_zoom_mode = default_set_zoom_mode, \
-}
+#define DEFAULT_OPS                               \
+	{                                             \
+		.set_power_mode = default_set_power_mode, \
+		.set_zoom_mode = default_set_zoom_mode,   \
+	}
 
 static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 	{
-		.name       = "Acer C110",
-		.vendor_id  = 0x1de1,
+		.name = "Acer C110",
+		.vendor_id = 0x1de1,
 		.product_id = 0xc101,
-		.configuration    = 2,
+		.configuration = 2,
 		.interface_number = 0,
 		.ops = DEFAULT_OPS,
 	},
 	{
-		.name       = "Acer C112",
-		.vendor_id  = 0x1de1,
+		.name = "Acer C112",
+		.vendor_id = 0x1de1,
 		.product_id = 0x5501,
-		.configuration    = 2,
+		.configuration = 2,
 		.interface_number = 0,
 		.ops = DEFAULT_OPS,
 	},
 	{
-		.name       ="Aiptek PocketCinema T25",
-		.vendor_id  = 0x08ca,
+		.name = "Aiptek PocketCinema T25",
+		.vendor_id = 0x08ca,
 		.product_id = 0x2144,
-		.configuration    = 2,
+		.configuration = 2,
 		.interface_number = 0,
 		.ops = DEFAULT_OPS,
 	},
 	{
-		.name       = "Philips/Sagemcom PicoPix 1020",
-		.vendor_id  = 0x21e7,
+		.name = "Philips/Sagemcom PicoPix 1020",
+		.vendor_id = 0x21e7,
 		.product_id = 0x000e,
-		.configuration    = 2,
+		.configuration = 2,
 		.interface_number = 0,
 		.ops = DEFAULT_OPS,
 	},
 	{
-		.name       = "Philips/Sagemcom PicoPix 2055",
-		.vendor_id  = 0x21e7,
+		.name = "Philips/Sagemcom PicoPix 2055",
+		.vendor_id = 0x21e7,
 		.product_id = 0x0016,
-		.configuration    = 2,
+		.configuration = 2,
 		.interface_number = 0,
 		.ops = {
 			.set_power_mode = picopix_set_power_mode,
@@ -145,10 +148,10 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
 		},
 	},
 	{
-		.name       = "Philips/Sagemcom PicoPix 2330",
-		.vendor_id  = 0x21e7,
+		.name = "Philips/Sagemcom PicoPix 2330",
+		.vendor_id = 0x21e7,
 		.product_id = 0x0019,
-		.configuration    = 1,
+		.configuration = 1,
 		.interface_number = 0,
 	},
 };
@@ -159,7 +162,8 @@ static const struct am7xxx_usb_device_descriptor supported_devices[] = {
  */
 #define AM7XXX_HEADER_WIRE_SIZE 24
 
-struct _am7xxx_device {
+struct _am7xxx_device
+{
 	libusb_device_handle *usb_device;
 	struct libusb_transfer *transfer;
 	int transfer_completed;
@@ -170,52 +174,59 @@ struct _am7xxx_device {
 	am7xxx_device *next;
 };
 
-struct _am7xxx_context {
+struct _am7xxx_context
+{
 	libusb_context *usb_context;
 	int log_level;
 	am7xxx_device *devices_list;
 };
 
-typedef enum {
+typedef enum
+{
 	AM7XXX_PACKET_TYPE_DEVINFO = 0x01,
-	AM7XXX_PACKET_TYPE_IMAGE   = 0x02,
-	AM7XXX_PACKET_TYPE_POWER   = 0x04,
-	AM7XXX_PACKET_TYPE_ZOOM    = 0x05,
-	AM7XXX_PACKET_TYPE_PICOPIX_POWER_LOW    = 0x15,
+	AM7XXX_PACKET_TYPE_IMAGE = 0x02,
+	AM7XXX_PACKET_TYPE_POWER = 0x04,
+	AM7XXX_PACKET_TYPE_ZOOM = 0x05,
+	AM7XXX_PACKET_TYPE_PICOPIX_POWER_LOW = 0x15,
 	AM7XXX_PACKET_TYPE_PICOPIX_POWER_MEDIUM = 0x16,
-	AM7XXX_PACKET_TYPE_PICOPIX_POWER_HIGH   = 0x17,
-	AM7XXX_PACKET_TYPE_PICOPIX_ENABLE_TI    = 0x18,
-	AM7XXX_PACKET_TYPE_PICOPIX_DISABLE_TI   = 0x19,
+	AM7XXX_PACKET_TYPE_PICOPIX_POWER_HIGH = 0x17,
+	AM7XXX_PACKET_TYPE_PICOPIX_ENABLE_TI = 0x18,
+	AM7XXX_PACKET_TYPE_PICOPIX_DISABLE_TI = 0x19,
 } am7xxx_packet_type;
 
-struct am7xxx_generic_header {
+struct am7xxx_generic_header
+{
 	uint32_t field0;
 	uint32_t field1;
 	uint32_t field2;
 	uint32_t field3;
 };
 
-struct am7xxx_devinfo_header {
+struct am7xxx_devinfo_header
+{
 	uint32_t native_width;
 	uint32_t native_height;
 	uint32_t unknown0;
 	uint32_t unknown1;
 };
 
-struct am7xxx_image_header {
+struct am7xxx_image_header
+{
 	uint32_t format;
 	uint32_t width;
 	uint32_t height;
 	uint32_t image_size;
 };
 
-struct am7xxx_power_header {
+struct am7xxx_power_header
+{
 	uint32_t bit2;
 	uint32_t bit1;
 	uint32_t bit0;
 };
 
-struct am7xxx_zoom_header {
+struct am7xxx_zoom_header
+{
 	uint32_t bit1;
 	uint32_t bit0;
 };
@@ -232,15 +243,17 @@ struct am7xxx_zoom_header {
 
 /* Direction of the communication from the host point of view */
 #define AM7XXX_DIRECTION_OUT 0 /* host -> device */
-#define AM7XXX_DIRECTION_IN  1 /* host <- device */
+#define AM7XXX_DIRECTION_IN 1  /* host <- device */
 
-struct am7xxx_header {
+struct am7xxx_header
+{
 	uint32_t packet_type;
 	uint8_t direction;
 	uint8_t header_data_len;
 	uint8_t unknown2;
 	uint8_t unknown3;
-	union {
+	union
+	{
 		struct am7xxx_generic_header data;
 		struct am7xxx_devinfo_header devinfo;
 		struct am7xxx_image_header image;
@@ -248,7 +261,6 @@ struct am7xxx_header {
 		struct am7xxx_zoom_header zoom;
 	} header_data;
 };
-
 
 #ifdef DEBUG
 static void debug_dump_generic_header(am7xxx_context *ctx, struct am7xxx_generic_header *g)
@@ -316,14 +328,14 @@ static void debug_dump_header(am7xxx_context *ctx, struct am7xxx_header *h)
 	debug(ctx, "BEGIN\n");
 	debug(ctx, "packet_type:     0x%08x (%u)\n", h->packet_type, h->packet_type);
 	debug(ctx, "direction:       0x%02hhx (%hhu) (%s)\n", h->direction, h->direction,
-	      h->direction == AM7XXX_DIRECTION_IN ? "IN" :
-	      h->direction == AM7XXX_DIRECTION_OUT ? "OUT" :
-	      "UNKNOWN");
+		  h->direction == AM7XXX_DIRECTION_IN ? "IN" : h->direction == AM7XXX_DIRECTION_OUT ? "OUT"
+																							: "UNKNOWN");
 	debug(ctx, "header_data_len: 0x%02hhx (%hhu)\n", h->header_data_len, h->header_data_len);
 	debug(ctx, "unknown2:        0x%02hhx (%hhu)\n", h->unknown2, h->unknown2);
 	debug(ctx, "unknown3:        0x%02hhx (%hhu)\n", h->unknown3, h->unknown3);
 
-	switch(h->packet_type) {
+	switch (h->packet_type)
+	{
 	case AM7XXX_PACKET_TYPE_DEVINFO:
 		debug_dump_devinfo_header(ctx, &(h->header_data.devinfo));
 		break;
@@ -356,7 +368,7 @@ static inline unsigned int in_80chars(unsigned int i)
 }
 
 static void trace_dump_buffer(am7xxx_context *ctx, const char *message,
-			      uint8_t *buffer, unsigned int len)
+							  uint8_t *buffer, unsigned int len)
 {
 	unsigned int i;
 
@@ -367,7 +379,8 @@ static void trace_dump_buffer(am7xxx_context *ctx, const char *message,
 	if (message)
 		trace(ctx, "%s\n", message);
 
-	for (i = 0; i < len; i++) {
+	for (i = 0; i < len; i++)
+	{
 		trace(ctx, "%02hhX%c", buffer[i], (in_80chars(i) && (i < len - 1)) ? ' ' : '\n');
 	}
 	trace(ctx, "\n");
@@ -380,7 +393,7 @@ static void debug_dump_header(am7xxx_context *ctx, struct am7xxx_header *h)
 }
 
 static void trace_dump_buffer(am7xxx_context *ctx, const char *message,
-			      uint8_t *buffer, unsigned int len)
+							  uint8_t *buffer, unsigned int len)
 {
 	(void)ctx;
 	(void)message;
@@ -396,9 +409,10 @@ static int read_data(am7xxx_device *dev, uint8_t *buffer, unsigned int len)
 
 	transferred = 0;
 	ret = libusb_bulk_transfer(dev->usb_device, 0x81, buffer, len, &transferred, 0);
-	if (ret != 0 || (unsigned int)transferred != len) {
+	if (ret != 0 || (unsigned int)transferred != len)
+	{
 		error(dev->ctx, "%s. Transferred: %d (expected %u)\n",
-		      libusb_error_name(ret), transferred, len);
+			  libusb_error_name(ret), transferred, len);
 		return ret;
 	}
 
@@ -416,9 +430,10 @@ static int send_data(am7xxx_device *dev, uint8_t *buffer, unsigned int len)
 
 	transferred = 0;
 	ret = libusb_bulk_transfer(dev->usb_device, 0x1, buffer, len, &transferred, 0);
-	if (ret != 0 || (unsigned int)transferred != len) {
+	if (ret != 0 || (unsigned int)transferred != len)
+	{
 		error(dev->ctx, "%s. Transferred: %d (expected %u)\n",
-		      libusb_error_name(ret), transferred, len);
+			  libusb_error_name(ret), transferred, len);
 		return ret;
 	}
 
@@ -432,12 +447,14 @@ static void LIBUSB_CALL send_data_async_complete_cb(struct libusb_transfer *tran
 	int transferred = transfer->actual_length;
 	int ret;
 
-	if (transferred != transfer->length) {
+	if (transferred != transfer->length)
+	{
 		error(dev->ctx, "transferred: %d (expected %u)\n",
-		      transferred, transfer->length);
+			  transferred, transfer->length);
 	}
 
-	switch (transfer->status) {
+	switch (transfer->status)
+	{
 	case LIBUSB_TRANSFER_COMPLETED:
 		ret = 0;
 		break;
@@ -464,7 +481,7 @@ static void LIBUSB_CALL send_data_async_complete_cb(struct libusb_transfer *tran
 
 	if (ret < 0)
 		error(dev->ctx, "libusb transfer failed: %s",
-		      libusb_error_name(ret));
+			  libusb_error_name(ret));
 
 	libusb_free_transfer(transfer);
 	transfer = NULL;
@@ -474,14 +491,16 @@ static void LIBUSB_CALL send_data_async_complete_cb(struct libusb_transfer *tran
 
 static inline void wait_for_trasfer_completed(am7xxx_device *dev)
 {
-	while (!dev->transfer_completed) {
+	while (!dev->transfer_completed)
+	{
 		int ret = libusb_handle_events_completed(dev->ctx->usb_context,
-							 &(dev->transfer_completed));
-		if (ret < 0) {
+												 &(dev->transfer_completed));
+		if (ret < 0)
+		{
 			if (ret == LIBUSB_ERROR_INTERRUPTED)
 				continue;
 			error(dev->ctx, "libusb_handle_events failed: %s, cancelling transfer and retrying",
-			      libusb_error_name(ret));
+				  libusb_error_name(ret));
 			libusb_cancel_transfer(dev->transfer);
 			continue;
 		}
@@ -494,9 +513,10 @@ static int send_data_async(am7xxx_device *dev, uint8_t *buffer, unsigned int len
 	uint8_t *transfer_buffer;
 
 	dev->transfer = libusb_alloc_transfer(0);
-	if (dev->transfer == NULL) {
+	if (dev->transfer == NULL)
+	{
 		error(dev->ctx, "cannot allocate transfer (%s)\n",
-		      strerror(errno));
+			  strerror(errno));
 		return -ENOMEM;
 	}
 
@@ -505,9 +525,10 @@ static int send_data_async(am7xxx_device *dev, uint8_t *buffer, unsigned int len
 	 * requires more dynamic allocations compared to a proper
 	 * double-buffering approach but it takes a lot less code. */
 	transfer_buffer = malloc(len);
-	if (transfer_buffer == NULL) {
+	if (transfer_buffer == NULL)
+	{
 		error(dev->ctx, "cannot allocate transfer buffer (%s)\n",
-		      strerror(errno));
+			  strerror(errno));
 		ret = -ENOMEM;
 		goto err;
 	}
@@ -515,8 +536,8 @@ static int send_data_async(am7xxx_device *dev, uint8_t *buffer, unsigned int len
 
 	dev->transfer->flags |= LIBUSB_TRANSFER_FREE_BUFFER;
 	libusb_fill_bulk_transfer(dev->transfer, dev->usb_device, 0x1,
-				  transfer_buffer, len,
-				  send_data_async_complete_cb, dev, 0);
+							  transfer_buffer, len,
+							  send_data_async_complete_cb, dev, 0);
 
 	/* wait for the previous transfer to complete */
 	wait_for_trasfer_completed(dev);
@@ -576,12 +597,15 @@ static int read_header(am7xxx_device *dev, struct am7xxx_header *h)
 
 	unserialize_header(dev->buffer, h);
 
-	if (h->direction == AM7XXX_DIRECTION_IN) {
+	if (h->direction == AM7XXX_DIRECTION_IN)
+	{
 		ret = 0;
-	} else {
+	}
+	else
+	{
 		error(dev->ctx,
-		      "Expected an AM7XXX_DIRECTION_IN packet, got one with direction = %d. Weird!\n",
-		      h->direction);
+			  "Expected an AM7XXX_DIRECTION_IN packet, got one with direction = %d. Weird!\n",
+			  h->direction);
 		ret = -EINVAL;
 	}
 
@@ -614,11 +638,11 @@ static int send_header(am7xxx_device *dev, struct am7xxx_header *h)
 static int send_command(am7xxx_device *dev, am7xxx_packet_type type)
 {
 	struct am7xxx_header h = {
-		.packet_type     = type,
-		.direction       = AM7XXX_DIRECTION_OUT,
+		.packet_type = type,
+		.direction = AM7XXX_DIRECTION_OUT,
 		.header_data_len = 0x00,
-		.unknown2        = 0x3e,
-		.unknown3        = 0x10,
+		.unknown2 = 0x3e,
+		.unknown3 = 0x10,
 		.header_data = {
 			.data = {
 				.field0 = 0,
@@ -632,22 +656,23 @@ static int send_command(am7xxx_device *dev, am7xxx_packet_type type)
 	return send_header(dev, &h);
 }
 
-
 /* When level == AM7XXX_LOG_FATAL do not check the log_level from the context
  * and print the message unconditionally, this makes it possible to print
  * fatal messages even early on initialization, before the context has been
  * set up */
 static void log_message(am7xxx_context *ctx,
-			int level,
-			const char *function_name,
-			int line,
-			const char *fmt,
-			...)
+						int level,
+						const char *function_name,
+						int line,
+						const char *fmt,
+						...)
 {
 	va_list ap;
 
-	if (level == AM7XXX_LOG_FATAL || (ctx && level <= ctx->log_level)) {
-		if (function_name) {
+	if (level == AM7XXX_LOG_FATAL || (ctx && level <= ctx->log_level))
+	{
+		if (function_name)
+		{
 			fprintf(stderr, "%s", function_name);
 			if (line)
 				fprintf(stderr, "[%d]", line);
@@ -663,18 +688,20 @@ static void log_message(am7xxx_context *ctx,
 }
 
 static am7xxx_device *add_new_device(am7xxx_context *ctx,
-				     const struct am7xxx_usb_device_descriptor *desc)
+									 const struct am7xxx_usb_device_descriptor *desc)
 {
 	am7xxx_device **devices_list;
 	am7xxx_device *new_device;
 
-	if (ctx == NULL) {
+	if (ctx == NULL)
+	{
 		fatal("context must not be NULL!\n");
 		return NULL;
 	}
 
 	new_device = malloc(sizeof(*new_device));
-	if (new_device == NULL) {
+	if (new_device == NULL)
+	{
 		debug(ctx, "cannot allocate a new device (%s)\n", strerror(errno));
 		return NULL;
 	}
@@ -686,9 +713,12 @@ static am7xxx_device *add_new_device(am7xxx_context *ctx,
 
 	devices_list = &(ctx->devices_list);
 
-	if (*devices_list == NULL) {
+	if (*devices_list == NULL)
+	{
 		*devices_list = new_device;
-	} else {
+	}
+	else
+	{
 		am7xxx_device *prev = *devices_list;
 		while (prev->next)
 			prev = prev->next;
@@ -698,12 +728,13 @@ static am7xxx_device *add_new_device(am7xxx_context *ctx,
 }
 
 static am7xxx_device *find_device(am7xxx_context *ctx,
-				  unsigned int device_index)
+								  unsigned int device_index)
 {
 	unsigned int i = 0;
 	am7xxx_device *current;
 
-	if (ctx == NULL) {
+	if (ctx == NULL)
+	{
 		fatal("context must not be NULL!\n");
 		return NULL;
 	}
@@ -716,27 +747,30 @@ static am7xxx_device *find_device(am7xxx_context *ctx,
 }
 
 static int open_device(am7xxx_context *ctx,
-		       unsigned int device_index,
-		       libusb_device *usb_dev,
-		       am7xxx_device **dev)
+					   unsigned int device_index,
+					   libusb_device *usb_dev,
+					   am7xxx_device **dev)
 {
 	int ret;
 	int current_configuration;
 
 	*dev = find_device(ctx, device_index);
-	if (*dev == NULL) {
+	if (*dev == NULL)
+	{
 		ret = -ENODEV;
 		goto out;
 	}
 
 	/* the usb device has already been opened */
-	if ((*dev)->usb_device) {
+	if ((*dev)->usb_device)
+	{
 		ret = 1;
 		goto out;
 	}
 
 	ret = libusb_open(usb_dev, &((*dev)->usb_device));
-	if (ret < 0) {
+	if (ret < 0)
+	{
 		debug(ctx, "libusb_open failed: %s\n", libusb_error_name(ret));
 		goto out;
 	}
@@ -747,14 +781,16 @@ static int open_device(am7xxx_context *ctx,
 
 	current_configuration = -1;
 	ret = libusb_get_configuration((*dev)->usb_device,
-				       &current_configuration);
-	if (ret < 0) {
+								   &current_configuration);
+	if (ret < 0)
+	{
 		debug(ctx, "libusb_get_configuration failed: %s\n",
-		      libusb_error_name(ret));
+			  libusb_error_name(ret));
 		goto out_libusb_close;
 	}
 
-	if (current_configuration != (*dev)->desc->configuration) {
+	if (current_configuration != (*dev)->desc->configuration)
+	{
 		/*
 		 * In principle, before setting a new configuration, kernel
 		 * drivers should be detached from _all_ interfaces; for
@@ -776,12 +812,13 @@ static int open_device(am7xxx_context *ctx,
 		 *     below will suceed.
 		 */
 		ret = libusb_set_configuration((*dev)->usb_device,
-					       (*dev)->desc->configuration);
-		if (ret < 0) {
+									   (*dev)->desc->configuration);
+		if (ret < 0)
+		{
 			debug(ctx, "libusb_set_configuration failed: %s\n",
-			      libusb_error_name(ret));
+				  libusb_error_name(ret));
 			debug(ctx, "Cannot set configuration %hhu\n",
-			      (*dev)->desc->configuration);
+				  (*dev)->desc->configuration);
 			goto out_libusb_close;
 		}
 	}
@@ -789,12 +826,13 @@ static int open_device(am7xxx_context *ctx,
 	libusb_set_auto_detach_kernel_driver((*dev)->usb_device, 1);
 
 	ret = libusb_claim_interface((*dev)->usb_device,
-				     (*dev)->desc->interface_number);
-	if (ret < 0) {
+								 (*dev)->desc->interface_number);
+	if (ret < 0)
+	{
 		debug(ctx, "libusb_claim_interface failed: %s\n",
-		      libusb_error_name(ret));
+			  libusb_error_name(ret));
 		debug(ctx, "Cannot claim interface %hhu\n",
-		      (*dev)->desc->interface_number);
+			  (*dev)->desc->interface_number);
 		goto out_libusb_close;
 	}
 
@@ -803,16 +841,18 @@ static int open_device(am7xxx_context *ctx,
 	 */
 	current_configuration = -1;
 	ret = libusb_get_configuration((*dev)->usb_device,
-				       &current_configuration);
-	if (ret < 0) {
+								   &current_configuration);
+	if (ret < 0)
+	{
 		debug(ctx, "libusb_get_configuration after claim failed: %s\n",
-		      libusb_error_name(ret));
+			  libusb_error_name(ret));
 		goto out_libusb_release_interface;
 	}
 
-	if (current_configuration != (*dev)->desc->configuration) {
+	if (current_configuration != (*dev)->desc->configuration)
+	{
 		debug(ctx, "libusb configuration changed (expected: %hhu, current: %d)\n",
-		      (*dev)->desc->configuration, current_configuration);
+			  (*dev)->desc->configuration, current_configuration);
 		ret = -EINVAL;
 		goto out_libusb_release_interface;
 	}
@@ -821,14 +861,15 @@ out:
 
 out_libusb_release_interface:
 	libusb_release_interface((*dev)->usb_device,
-				 (*dev)->desc->interface_number);
+							 (*dev)->desc->interface_number);
 out_libusb_close:
 	libusb_close((*dev)->usb_device);
 	(*dev)->usb_device = NULL;
 	return ret;
 }
 
-typedef enum {
+typedef enum
+{
 	SCAN_OP_BUILD_DEVLIST,
 	SCAN_OP_OPEN_DEVICE,
 } scan_op;
@@ -852,7 +893,7 @@ typedef enum {
  * devices possibly added before the failure.
  */
 static int scan_devices(am7xxx_context *ctx, scan_op op,
-			unsigned int open_device_index, am7xxx_device **dev)
+						unsigned int open_device_index, am7xxx_device **dev)
 {
 	ssize_t num_devices;
 	libusb_device **list;
@@ -860,23 +901,27 @@ static int scan_devices(am7xxx_context *ctx, scan_op op,
 	int i;
 	int ret;
 
-	if (ctx == NULL) {
+	if (ctx == NULL)
+	{
 		fatal("context must not be NULL!\n");
 		return -EINVAL;
 	}
-	if (op == SCAN_OP_BUILD_DEVLIST && ctx->devices_list != NULL) {
+	if (op == SCAN_OP_BUILD_DEVLIST && ctx->devices_list != NULL)
+	{
 		error(ctx, "device scan done already? Abort!\n");
 		return -EINVAL;
 	}
 
 	num_devices = libusb_get_device_list(ctx->usb_context, &list);
-	if (num_devices < 0) {
+	if (num_devices < 0)
+	{
 		ret = -ENODEV;
 		goto out;
 	}
 
 	current_index = 0;
-	for (i = 0; i < num_devices; i++) {
+	for (i = 0; i < num_devices; i++)
+	{
 		struct libusb_device_descriptor desc;
 		unsigned int j;
 
@@ -884,17 +929,21 @@ static int scan_devices(am7xxx_context *ctx, scan_op op,
 		if (ret < 0)
 			continue;
 
-		for (j = 0; j < ARRAY_SIZE(supported_devices); j++) {
+		for (j = 0; j < ARRAY_SIZE(supported_devices); j++)
+		{
 			if (desc.idVendor == supported_devices[j].vendor_id &&
-			    desc.idProduct == supported_devices[j].product_id) {
+				desc.idProduct == supported_devices[j].product_id)
+			{
 
-				if (op == SCAN_OP_BUILD_DEVLIST) {
+				if (op == SCAN_OP_BUILD_DEVLIST)
+				{
 					am7xxx_device *new_device;
 					info(ctx, "am7xxx device found, index: %d, name: %s\n",
-					     current_index,
-					     supported_devices[j].name);
+						 current_index,
+						 supported_devices[j].name);
 					new_device = add_new_device(ctx, &supported_devices[j]);
-					if (new_device == NULL) {
+					if (new_device == NULL)
+					{
 						/* XXX, the caller may want
 						 * to call am7xxx_shutdown() if
 						 * we fail here, as we may have
@@ -904,13 +953,15 @@ static int scan_devices(am7xxx_context *ctx, scan_op op,
 						ret = -ENODEV;
 						goto out;
 					}
-				} else if (op == SCAN_OP_OPEN_DEVICE &&
-					   current_index == open_device_index) {
+				}
+				else if (op == SCAN_OP_OPEN_DEVICE &&
+						 current_index == open_device_index)
+				{
 
 					ret = open_device(ctx,
-							  open_device_index,
-							  list[i],
-							  dev);
+									  open_device_index,
+									  list[i],
+									  dev);
 					if (ret < 0)
 						debug(ctx, "open_device failed\n");
 
@@ -926,7 +977,8 @@ static int scan_devices(am7xxx_context *ctx, scan_op op,
 
 	/* if we made it up to here when op == SCAN_OP_OPEN_DEVICE,
 	 * no devices to open had been found. */
-	if (op == SCAN_OP_OPEN_DEVICE) {
+	if (op == SCAN_OP_OPEN_DEVICE)
+	{
 		error(ctx, "Cannot find any device to open\n");
 		ret = -ENODEV;
 		goto out;
@@ -945,14 +997,15 @@ static int default_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power)
 {
 	int ret;
 	struct am7xxx_header h = {
-		.packet_type     = AM7XXX_PACKET_TYPE_POWER,
-		.direction       = AM7XXX_DIRECTION_OUT,
+		.packet_type = AM7XXX_PACKET_TYPE_POWER,
+		.direction = AM7XXX_DIRECTION_OUT,
 		.header_data_len = sizeof(struct am7xxx_power_header),
-		.unknown2        = 0x3e,
-		.unknown3        = 0x10,
+		.unknown2 = 0x3e,
+		.unknown3 = 0x10,
 	};
 
-	switch(power) {
+	switch (power)
+	{
 	case AM7XXX_POWER_OFF:
 		h.header_data.power.bit2 = 0;
 		h.header_data.power.bit1 = 0;
@@ -997,7 +1050,8 @@ static int default_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power)
 
 static int picopix_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power)
 {
-	switch(power) {
+	switch (power)
+	{
 	case AM7XXX_POWER_LOW:
 		return send_command(dev, AM7XXX_PACKET_TYPE_PICOPIX_POWER_LOW);
 
@@ -1019,14 +1073,15 @@ static int default_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
 {
 	int ret;
 	struct am7xxx_header h = {
-		.packet_type     = AM7XXX_PACKET_TYPE_ZOOM,
-		.direction       = AM7XXX_DIRECTION_OUT,
+		.packet_type = AM7XXX_PACKET_TYPE_ZOOM,
+		.direction = AM7XXX_DIRECTION_OUT,
 		.header_data_len = sizeof(struct am7xxx_zoom_header),
-		.unknown2        = 0x3e,
-		.unknown3        = 0x10,
+		.unknown2 = 0x3e,
+		.unknown3 = 0x10,
 	};
 
-	switch(zoom) {
+	switch (zoom)
+	{
 	case AM7XXX_ZOOM_ORIGINAL:
 		h.header_data.zoom.bit1 = 0;
 		h.header_data.zoom.bit0 = 0;
@@ -1065,7 +1120,8 @@ static int picopix_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
 	int ret;
 	am7xxx_packet_type packet_type;
 
-	switch(zoom) {
+	switch (zoom)
+	{
 	case AM7XXX_ZOOM_ORIGINAL:
 		packet_type = AM7XXX_PACKET_TYPE_PICOPIX_DISABLE_TI;
 		break;
@@ -1102,7 +1158,8 @@ AM7XXX_PUBLIC int am7xxx_init(am7xxx_context **ctx)
 	int ret;
 
 	*ctx = malloc(sizeof(**ctx));
-	if (*ctx == NULL) {
+	if (*ctx == NULL)
+	{
 		fatal("cannot allocate the context (%s)\n", strerror(errno));
 		return -ENOMEM;
 	}
@@ -1112,15 +1169,17 @@ AM7XXX_PUBLIC int am7xxx_init(am7xxx_context **ctx)
 	(*ctx)->log_level = AM7XXX_LOG_TRACE;
 
 	ret = libusb_init(&((*ctx)->usb_context));
-	if (ret < 0) {
+	if (ret < 0)
+	{
 		error(*ctx, "libusb_init failed: %s\n", libusb_error_name(ret));
 		goto out_free_context;
 	}
 
 	libusb_set_debug((*ctx)->usb_context, LIBUSB_LOG_LEVEL_INFO);
 
-	ret = scan_devices(*ctx, SCAN_OP_BUILD_DEVLIST , 0, NULL);
-	if (ret < 0) {
+	ret = scan_devices(*ctx, SCAN_OP_BUILD_DEVLIST, 0, NULL);
+	if (ret < 0)
+	{
 		error(*ctx, "scan_devices() failed\n");
 		am7xxx_shutdown(*ctx);
 		goto out;
@@ -1141,13 +1200,15 @@ AM7XXX_PUBLIC void am7xxx_shutdown(am7xxx_context *ctx)
 {
 	am7xxx_device *current;
 
-	if (ctx == NULL) {
+	if (ctx == NULL)
+	{
 		fatal("context must not be NULL!\n");
 		return;
 	}
 
 	current = ctx->devices_list;
-	while (current) {
+	while (current)
+	{
 		am7xxx_device *next = current->next;
 		am7xxx_close_device(current);
 		free(current->device_info);
@@ -1166,20 +1227,24 @@ AM7XXX_PUBLIC void am7xxx_set_log_level(am7xxx_context *ctx, am7xxx_log_level lo
 }
 
 AM7XXX_PUBLIC int am7xxx_open_device(am7xxx_context *ctx, am7xxx_device **dev,
-		       unsigned int device_index)
+									 unsigned int device_index)
 {
 	int ret;
 
-	if (ctx == NULL) {
+	if (ctx == NULL)
+	{
 		fatal("context must not be NULL!\n");
 		return -EINVAL;
 	}
 
 	ret = scan_devices(ctx, SCAN_OP_OPEN_DEVICE, device_index, dev);
-	if (ret < 0) {
+	if (ret < 0)
+	{
 		errno = ENODEV;
 		goto out;
-	} else if (ret > 0) {
+	}
+	else if (ret > 0)
+	{
 		warning(ctx, "device %d already open\n", device_index);
 		errno = EBUSY;
 		ret = -EBUSY;
@@ -1205,11 +1270,13 @@ out:
 
 AM7XXX_PUBLIC int am7xxx_close_device(am7xxx_device *dev)
 {
-	if (dev == NULL) {
+	if (dev == NULL)
+	{
 		fatal("dev must not be NULL!\n");
 		return -EINVAL;
 	}
-	if (dev->usb_device) {
+	if (dev->usb_device)
+	{
 		wait_for_trasfer_completed(dev);
 		libusb_release_interface(dev->usb_device, dev->desc->interface_number);
 		libusb_close(dev->usb_device);
@@ -1219,7 +1286,7 @@ AM7XXX_PUBLIC int am7xxx_close_device(am7xxx_device *dev)
 }
 
 AM7XXX_PUBLIC int am7xxx_get_device_info(am7xxx_device *dev,
-			   am7xxx_device_info *device_info)
+										 am7xxx_device_info *device_info)
 {
 	int ret;
 	struct am7xxx_header h;
@@ -1237,17 +1304,19 @@ AM7XXX_PUBLIC int am7xxx_get_device_info(am7xxx_device *dev,
 	if (ret < 0)
 		return ret;
 
-	if (h.packet_type != AM7XXX_PACKET_TYPE_DEVINFO) {
+	if (h.packet_type != AM7XXX_PACKET_TYPE_DEVINFO)
+	{
 		error(dev->ctx, "expected packet type: %d, got %d instead!\n",
-		      AM7XXX_PACKET_TYPE_DEVINFO, h.packet_type);
+			  AM7XXX_PACKET_TYPE_DEVINFO, h.packet_type);
 		errno = EINVAL;
 		return -EINVAL;
 	}
 
 	dev->device_info = malloc(sizeof(*dev->device_info));
-	if (dev->device_info == NULL) {
+	if (dev->device_info == NULL)
+	{
 		error(dev->ctx, "cannot allocate a device info (%s)\n",
-		       strerror(errno));
+			  strerror(errno));
 		return -ENOMEM;
 	}
 	memset(dev->device_info, 0, sizeof(*dev->device_info));
@@ -1267,11 +1336,11 @@ return_value:
 }
 
 AM7XXX_PUBLIC int am7xxx_calc_scaled_image_dimensions(am7xxx_device *dev,
-					unsigned int upscale,
-					unsigned int original_width,
-					unsigned int original_height,
-					unsigned int *scaled_width,
-					unsigned int *scaled_height)
+													  unsigned int upscale,
+													  unsigned int original_width,
+													  unsigned int original_height,
+													  unsigned int *scaled_width,
+													  unsigned int *scaled_height)
 {
 	am7xxx_device_info device_info;
 	float width_ratio;
@@ -1279,7 +1348,8 @@ AM7XXX_PUBLIC int am7xxx_calc_scaled_image_dimensions(am7xxx_device *dev,
 	int ret;
 
 	ret = am7xxx_get_device_info(dev, &device_info);
-	if (ret < 0) {
+	if (ret < 0)
+	{
 		error(dev->ctx, "cannot get device info\n");
 		return ret;
 	}
@@ -1289,8 +1359,9 @@ AM7XXX_PUBLIC int am7xxx_calc_scaled_image_dimensions(am7xxx_device *dev,
 	 * dimensions there is no need to, unless we want to upscale.
 	 */
 	if (!upscale &&
-	    original_width <= device_info.native_width &&
-	    original_height <= device_info.native_height ) {
+		original_width <= device_info.native_width &&
+		original_height <= device_info.native_height)
+	{
 		debug(dev->ctx, "CASE 0, no rescaling, the original image fits already\n");
 		*scaled_width = original_width;
 		*scaled_height = original_height;
@@ -1298,10 +1369,11 @@ AM7XXX_PUBLIC int am7xxx_calc_scaled_image_dimensions(am7xxx_device *dev,
 	}
 
 	/* Input dimensions relative to the device native dimensions */
-	width_ratio =  (float)original_width / device_info.native_width;
+	width_ratio = (float)original_width / device_info.native_width;
 	height_ratio = (float)original_height / device_info.native_height;
 
-	if (width_ratio > height_ratio) {
+	if (width_ratio > height_ratio)
+	{
 		/*
 		 * The input is proportionally "wider" than the device viewport
 		 * so its height needs to be adjusted
@@ -1309,7 +1381,9 @@ AM7XXX_PUBLIC int am7xxx_calc_scaled_image_dimensions(am7xxx_device *dev,
 		debug(dev->ctx, "CASE 1, original image wider, adjust the scaled height\n");
 		*scaled_width = device_info.native_width;
 		*scaled_height = (unsigned int)lroundf(original_height / width_ratio);
-	} else if (width_ratio < height_ratio) {
+	}
+	else if (width_ratio < height_ratio)
+	{
 		/*
 		 * The input is proportionally "taller" than the device viewport
 		 * so its width needs to be adjusted
@@ -1317,7 +1391,9 @@ AM7XXX_PUBLIC int am7xxx_calc_scaled_image_dimensions(am7xxx_device *dev,
 		debug(dev->ctx, "CASE 2 original image taller, adjust the scaled width\n");
 		*scaled_width = (unsigned int)lroundf(original_width / height_ratio);
 		*scaled_height = device_info.native_height;
-	} else {
+	}
+	else
+	{
 		debug(dev->ctx, "CASE 3, just rescale, same aspect ratio already\n");
 		*scaled_width = device_info.native_width;
 		*scaled_height = device_info.native_height;
@@ -1328,24 +1404,24 @@ AM7XXX_PUBLIC int am7xxx_calc_scaled_image_dimensions(am7xxx_device *dev,
 }
 
 AM7XXX_PUBLIC int am7xxx_send_image(am7xxx_device *dev,
-		      am7xxx_image_format format,
-		      unsigned int width,
-		      unsigned int height,
-		      uint8_t *image,
-		      unsigned int image_size)
+									am7xxx_image_format format,
+									unsigned int width,
+									unsigned int height,
+									uint8_t *image,
+									unsigned int image_size)
 {
 	int ret;
 	struct am7xxx_header h = {
-		.packet_type     = AM7XXX_PACKET_TYPE_IMAGE,
-		.direction       = AM7XXX_DIRECTION_OUT,
+		.packet_type = AM7XXX_PACKET_TYPE_IMAGE,
+		.direction = AM7XXX_DIRECTION_OUT,
 		.header_data_len = sizeof(struct am7xxx_image_header),
-		.unknown2        = 0x3e,
-		.unknown3        = 0x10,
+		.unknown2 = 0x3e,
+		.unknown3 = 0x10,
 		.header_data = {
 			.image = {
-				.format     = format,
-				.width      = width,
-				.height     = height,
+				.format = format,
+				.width = width,
+				.height = height,
 				.image_size = image_size,
 			},
 		},
@@ -1355,7 +1431,8 @@ AM7XXX_PUBLIC int am7xxx_send_image(am7xxx_device *dev,
 	if (ret < 0)
 		return ret;
 
-	if (image == NULL || image_size == 0) {
+	if (image == NULL || image_size == 0)
+	{
 		warning(dev->ctx, "Not sending any data, check the 'image' or 'image_size' parameters\n");
 		return 0;
 	}
@@ -1364,24 +1441,24 @@ AM7XXX_PUBLIC int am7xxx_send_image(am7xxx_device *dev,
 }
 
 AM7XXX_PUBLIC int am7xxx_send_image_async(am7xxx_device *dev,
-					  am7xxx_image_format format,
-					  unsigned int width,
-					  unsigned int height,
-					  uint8_t *image,
-					  unsigned int image_size)
+										  am7xxx_image_format format,
+										  unsigned int width,
+										  unsigned int height,
+										  uint8_t *image,
+										  unsigned int image_size)
 {
 	int ret;
 	struct am7xxx_header h = {
-		.packet_type     = AM7XXX_PACKET_TYPE_IMAGE,
-		.direction       = AM7XXX_DIRECTION_OUT,
+		.packet_type = AM7XXX_PACKET_TYPE_IMAGE,
+		.direction = AM7XXX_DIRECTION_OUT,
 		.header_data_len = sizeof(struct am7xxx_image_header),
-		.unknown2        = 0x3e,
-		.unknown3        = 0x10,
+		.unknown2 = 0x3e,
+		.unknown3 = 0x10,
 		.header_data = {
 			.image = {
-				.format     = format,
-				.width      = width,
-				.height     = height,
+				.format = format,
+				.width = width,
+				.height = height,
 				.image_size = image_size,
 			},
 		},
@@ -1391,7 +1468,8 @@ AM7XXX_PUBLIC int am7xxx_send_image_async(am7xxx_device *dev,
 	if (ret < 0)
 		return ret;
 
-	if (image == NULL || image_size == 0) {
+	if (image == NULL || image_size == 0)
+	{
 		warning(dev->ctx, "Not sending any data, check the 'image' or 'image_size' parameters\n");
 		return 0;
 	}
@@ -1401,9 +1479,10 @@ AM7XXX_PUBLIC int am7xxx_send_image_async(am7xxx_device *dev,
 
 AM7XXX_PUBLIC int am7xxx_set_power_mode(am7xxx_device *dev, am7xxx_power_mode power)
 {
-	if (dev->desc->ops.set_power_mode == NULL) {
+	if (dev->desc->ops.set_power_mode == NULL)
+	{
 		warning(dev->ctx,
-			"setting power mode is unsupported on this device\n");
+				"setting power mode is unsupported on this device\n");
 		return 0;
 	}
 
@@ -1412,9 +1491,10 @@ AM7XXX_PUBLIC int am7xxx_set_power_mode(am7xxx_device *dev, am7xxx_power_mode po
 
 AM7XXX_PUBLIC int am7xxx_set_zoom_mode(am7xxx_device *dev, am7xxx_zoom_mode zoom)
 {
-	if (dev->desc->ops.set_zoom_mode == NULL) {
+	if (dev->desc->ops.set_zoom_mode == NULL)
+	{
 		warning(dev->ctx,
-			"setting zoom mode is unsupported on this device\n");
+				"setting zoom mode is unsupported on this device\n");
 		return 0;
 	}
 
