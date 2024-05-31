@@ -1,3 +1,6 @@
+This is a fork of the original https://git.ao2.it/libam7xxx.git/
+I changed a few line to make it compile again, but it's still buggy.
+
 = libam7xxx
 
 libam7xxx is an Open Source library to communicate via USB with projectors and
